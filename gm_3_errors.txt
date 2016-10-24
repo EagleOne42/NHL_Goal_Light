@@ -1,0 +1,54 @@
+Current time: 02:56:59
+Now: 2016-04-17 14:56:59.185343
+Now.second: 59
+Refresh time: 5 seconds
+Current home_old_score: 1
+
+Could not get response from NHL.com trying again...
+Game ID: 2015030164
+Using last file - Bad JSON data
+invalid json: No JSON object could be decoded
+Running GPIO Cleanup
+Traceback (most recent call last):
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 534, in <module>
+    main()
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 220, in main
+    h_dict = game_json_data_clean['h']
+KeyError: 'h'
+
+
+
+Current time: 04:32:57
+Now: 2016-04-17 16:32:57.782276
+Now.second: 57
+Refresh time: 5 seconds
+Current home_old_score: 2
+
+Game ID: 2015030163
+Using last file - Bad JSON data
+invalid json: Unterminated string starting at: line 1 column 408 (char 407)
+Running GPIO Cleanup
+Traceback (most recent call last):
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 534, in <module>
+    main()
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 220, in main
+    h_dict = game_json_data_clean['h']
+KeyError: 'h'
+
+Current time: 05:00:20
+Now: 2016-04-17 17:00:20.066029
+Now.second: 20
+Refresh time: 5 seconds
+Current home_old_score: 3
+
+Game ID: 2015030163
+Using last file - Bad JSON data
+invalid json: Unterminated string starting at: line 1 column 410 (char 409)
+Running GPIO Cleanup
+Traceback (most recent call last):
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 534, in <module>
+    main()
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 220, in main
+    h_dict = game_json_data_clean['h']
+KeyError: 'h'
+

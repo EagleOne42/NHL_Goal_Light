@@ -1,0 +1,55 @@
+Current time: 09:14:18
+Now: 2016-04-13 21:14:18.071953
+Now.second: 18
+Refresh time: 5 seconds
+Current home_old_score: 0
+
+Game ID: 2015030161
+Chicago Blackhawks @ St Louis Blues
+(01:22 1st PERIOD)
+Blackhawks: 0
+Blues: 0
+
+
+Current time: 09:14:23
+Now: 2016-04-13 21:14:23.352036
+Now.second: 23
+Refresh time: 5 seconds
+Current home_old_score: 0
+
+Game ID: 2015030161
+Using last file - Bad JSON data
+invalid json: Unterminated string starting at: line 1 column 485 (char 484)
+Running GPIO Cleanup
+Traceback (most recent call last):
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 533, in <module>
+    main()
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 220, in main
+    h_dict = game_json_data_clean['h']
+KeyError: 'h'
+
+
+Game ID: 2015030161
+Chicago Blackhawks @ St Louis Blues
+(12:25 3rd PERIOD)
+Blackhawks: 0
+Blues: 0
+
+
+Current time: 10:46:44
+Now: 2016-04-13 22:46:44.090019
+Now.second: 44
+Refresh time: 5 seconds
+Current home_old_score: 0
+
+Game ID: 2015030161
+Using last file - Bad JSON data
+invalid json: Expecting object: line 1 column 437 (char 436)
+Running GPIO Cleanup
+Traceback (most recent call last):
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 533, in <module>
+    main()
+  File "Scoreboard_full_rebuild_one_team_gpio.py", line 220, in main
+    h_dict = game_json_data_clean['h']
+KeyError: 'h'
+
