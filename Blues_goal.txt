@@ -69,3 +69,5 @@ Script startup at 2016-04-18 20:18:29.123707
 BLUES GOAL AT 2016-04-18 20:18:37.689673
 Script startup at 2016-05-24 21:25:42.880560
 Script startup at 2016-05-24 21:26:32.505063
+Script startup at 2016-10-24 14:15:48.990605
+Script startup at 2016-10-24 14:51:38.539215
