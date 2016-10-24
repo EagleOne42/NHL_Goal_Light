@@ -95,6 +95,10 @@ print('Disabled GPIO')#gpio_disable GPIO.setmode(GPIO.BOARD) #Use the pin number
 print('Disabled GPIO')#gpio_disable goal_light_gpio_pins = [7] #For multiple lights enter the gpio like this - [7,11,13,15,16]
 print('Disabled GPIO')#gpio_disable GPIO.setup(goal_light_gpio_pins, GPIO.OUT) #Set the Raspberry Pi GPIO pins as output to activate relays/leds
 
+target = open('Blues_goal.txt', 'a')
+target.write('Script startup at %s\n' % str(datetime.datetime.now()))
+target.close()
+
 refresh_time = 21600  # 6 hours Refresh time (seconds), NHL API refresh is every 60 seconds
 api_url = 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp' #NHL JSON API with the game IDs and basic info
 #'game_api_url' is defined in the code below to pull the score for each game from what should update faster
@@ -366,16 +370,14 @@ def game_current(current_team_name, current_team_score, game_clock, status):
 		
 		
 		elif (game_date == "TODAY"): #Game time is near
-			refresh_time = 3600 # 1 hours
+			refresh_time = 1800 # half hour
 			print "It is game day!"
-			print "Refresh time is : " + str(refresh_time) + " seconds (1 hour)"
-		
+			print "Refresh time is : " + str(refresh_time) + " seconds (30 min)"
 		
 		elif (game_date == "PRE GAME"): #30 minutes to game time
 			refresh_time = 300 # 5 minutes
 			print "It is almost game time!"
 			print "Refresh time: " + str(refresh_time) + " seconds (5 minutes)"
-		
 		
 		else: # Game is underway
 			print "Now: " + str(now)
@@ -384,7 +386,7 @@ def game_current(current_team_name, current_team_score, game_clock, status):
 			#The API url refreshes at exactly the next minute. So we calculate the time until the next minute, set it to refresh then
 			#refresh_time = 63 - now.second - now.microsecond/1e6
 			refresh_time = 5
-			print "Time untill next minute: " + str(refresh_time)
+			#print "Time untill next minute: " + str(refresh_time)
 			print "Refresh time: " + str(refresh_time) + " seconds"
 			print "Current home_old_score: " + str(home_old_score)
 			
@@ -392,7 +394,10 @@ def game_current(current_team_name, current_team_score, game_clock, status):
 			if int(home_old_score) < int(current_team_score): # If the old score < the new score, a goal was scored
 				print team + " have scored a goal!"
 				current_count = 0
-				while (current_count < 40):
+				target = open('Blues_goal.txt', 'a')
+			        target.write('BLUES GOAL AT %s\n' % str(datetime.datetime.now()))
+			        target.close()
+				while (current_count < 80):
 					print 'Count is:', current_count
 					time.sleep(1)
 					current_count += 1
@@ -439,12 +444,14 @@ def setup_light():
 		setup_light()
 		return
 		
-	print 'TEST GOAL LIGHT!!! - The light should be in beacon (rotating) mode - if not, restart this script'
-	activate_goal_light()
+	light_on()
+	raw_input("Press Enter to continue if the light in is beacon (rotating) mode - if not, restart this script...")
+	light_off()	
+	reset_light()
 
 
 def reset_light():
-	for i in range(0, 3):
+	for i in range(1, 4):
 		cycle_light()
 
 def light_on():
