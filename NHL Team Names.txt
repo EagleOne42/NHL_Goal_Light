@@ -3,8 +3,8 @@ team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Cana
 nhl_team_dict = {
 	'Anaheim': 'Ducks',
 	'ANA': 'Ducks',
-	'Arizona': 'Coyototes',
-	'Phoenix': 'Coyototes',
+	'Arizona': 'Coyotes',
+	'Phoenix': 'Coyotes',
 	'ARI': 'Coyotes',
 	'Boston': 'Bruins',
 	'BOS': 'Bruins',
