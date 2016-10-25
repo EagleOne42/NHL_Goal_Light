@@ -1,4 +1,4 @@
-team = 'Blues' #Set default team
+team = 'Flames' #Set default team
 
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
@@ -95,7 +95,7 @@ print('Disabled GPIO')#gpio_disable GPIO.setmode(GPIO.BOARD) #Use the pin number
 print('Disabled GPIO')#gpio_disable goal_light_gpio_pins = [7] #For multiple lights enter the gpio like this - [7,11,13,15,16]
 print('Disabled GPIO')#gpio_disable GPIO.setup(goal_light_gpio_pins, GPIO.OUT) #Set the Raspberry Pi GPIO pins as output to activate relays/leds
 
-target = open('Flames_goal.txt', 'a')
+target = open('logs/Flames_goal.txt', 'a')
 target.write('Script startup at %s\n' % str(datetime.datetime.now()))
 target.close()
 
@@ -164,7 +164,7 @@ def main():
 			for key in scoreboard_json_data_clean:
 				if key == 'games':
 					for game_info in scoreboard_json_data_clean[key]:
-						if ( game_info['atv'].title() == "Flames" ) or ( game_info['htv'].title() == "Flames" ):
+						if ( game_info['id'] == 2016020089 ):
 							# Assign more meaningful names
 							gc_id = game_info['id']
 							game_clock = game_info['ts']
@@ -395,7 +395,7 @@ def game_current(current_team_name, current_team_score, game_clock, status):
 			if int(home_old_score) < int(current_team_score): # If the old score < the new score, a goal was scored
 				print team + " have scored a goal!"
 				current_count = 0
-				target = open('Flames_goal.txt', 'a')
+				target = open('log/Flames_goal.txt', 'a')
 			        target.write('Flames GOAL AT %s\n' % str(datetime.datetime.now()))
 			        target.close()
 				while (current_count < 80):
