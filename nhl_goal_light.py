@@ -285,7 +285,6 @@ def light_on():
 def light_off():
 	print('Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, False)
 	time.sleep(0.25)
-		
 
 
 def cycle_light():
