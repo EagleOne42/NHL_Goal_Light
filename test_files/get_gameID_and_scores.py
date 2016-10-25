@@ -17,7 +17,7 @@ __author__ = 'EagleOne42'
 i = datetime.datetime.now()  # date and time formatting http://www.cyberciti.biz/faq/howto-get-current-date-time-in-python/
 
 show_today_only = False
-nhl_year='20152016'
+nhl_year='20162017'
 api_url = 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp'
 api_headers = {'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36', 'Referer': 'http://www.nhl.com/ice/scores.htm'}
 
@@ -165,7 +165,7 @@ def main():
 						away_team_name = fix_name(away_team_name)
 						home_team_name = fix_name(home_team_name)
 
-						game_api_url = 'http://live.nhle.com/GameData/20152016/%d/gc/gcsb.jsonp' % gc_id
+						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 
 						try:
 							q = requests.get(game_api_url, headers=api_headers) #making sure there is a connection with the API
