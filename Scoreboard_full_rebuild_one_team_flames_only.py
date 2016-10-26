@@ -395,7 +395,7 @@ def game_current(current_team_name, current_team_score, game_clock, status):
 			if int(home_old_score) < int(current_team_score): # If the old score < the new score, a goal was scored
 				print team + " have scored a goal!"
 				current_count = 0
-				target = open('log/Flames_goal.txt', 'a')
+				target = open('logs/Flames_goal.txt', 'a')
 			        target.write('Flames GOAL AT %s\n' % str(datetime.datetime.now()))
 			        target.close()
 				while (current_count < 80):
