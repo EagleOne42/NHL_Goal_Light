@@ -1,4 +1,4 @@
-team = 'Blues' #Set default team
+team = 'Blues' #Set default team - will use this if the team option flag is not used
 
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
@@ -99,7 +99,7 @@ target = open('logs/goal_log.txt', 'a')
 target.write('Script startup at %s\n' % str(datetime.datetime.now()))
 target.close()
 
-refresh_time = 21600  # 6 hours Refresh time (seconds), NHL API refresh is every 60 seconds
+refresh_time = 3600  # Default to 1 hours Refresh time (seconds), NHL API refresh is every 60 seconds
 api_url = 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp' #NHL JSON API with the game IDs and basic info
 #'game_api_url' is defined in the code below to pull the score for each game - should update more often then the 'api_url'
 api_headers = {'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36', 'Referer': 'http://www.nhl.com/ice/scores.htm'}
@@ -110,7 +110,6 @@ team_playing = False
 
 #Away team variables
 away_old_score = 0
-show_today_only = False
 
 
 def main():
@@ -131,65 +130,12 @@ def main():
 	y =y = t - datetime.timedelta(days=1)
 	yesterdays_date = "" + y.strftime("%A") + " " + "%s/%s" % (y.month, y.day)
 	
+	print ("DEBUG: Call get game info")
+	get_game_info()
+	
 	while True:
-		try:
-			scoreboard_jsonp_web = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
-		except (requests.ConnectionError): #Catch these errors
-			print ("Could not get response from NHL.com trying again...")
-			time.sleep(5)
-			continue
-		except(requests.HTTPError):
-			print ("HTTP Error when loading url. Please restart program. ")
-			sys.exit(0)
-		except(requests.Timeout):
-			print ("The request took too long to process and timed out. Trying again... ")
-			time.sleep(5)
-		except(socket.error):
-			print ("Could not get response from NHL.com trying again...")
-			time.sleep(5)
-		except(requests.RequestException):
-			print ("Unknown error. Please restart the program. ")
-			sys.exit(0)
-			
-		# We get back JSON data with some JS around it, gotta remove the JS
-		scoreboard_jsonp_data = scoreboard_jsonp_web.text
-		# Remove the leading JS
-		scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
-		# Remove the trailing ')'
-		scoreboard_json_data  = scoreboard_json_data[:-1]
-		#Send to the parse function and save the cleaned json data
-		scoreboard_json_data_clean = parse_json(scoreboard_json_data)
-		
-		print ("Start json parse")
-		for key in scoreboard_json_data_clean:
-			if key == 'games':
-				for game_info in scoreboard_json_data_clean[key]:
-					print ("Away team is %s " % game_info['atv'].title())
-					print ("Home team is %s " % game_info['htv'].title())
-					if ( game_info['atv'].title() == team ) or ( game_info['htv'].title() == team ):
-						# Assign more meaningful names
-						gc_id = game_info['id']
-						print ("Game ID: %d " % gc_id)
-						game_clock = game_info['ts']
-						game_stage = game_info['tsc']
-						status = game_info['bs']
-						
-						away_team_locale = game_info['atn']
-						away_team_name = game_info['atv'].title()
-						away_team_result = game_info['atc']
-						
-						home_team_locale = game_info['htn']
-						home_team_name = game_info['htv'].title()
-						home_team_result = game_info['htc']
-						
-						# Fix strange names / locales returned by NHL
-						away_team_locale = fix_locale(away_team_locale)
-						home_team_locale = fix_locale(home_team_locale)
-						away_team_name = fix_name(away_team_name)
-						home_team_name = fix_name(home_team_name)
-						
-						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 		print ("End of main. ")
+		time.sleep(10)
 
 
 def clear_screen():
@@ -233,6 +179,67 @@ def fix_name(team_name):
 		return 'Maple Leafs'
 	
 	return team_name
+
+
+def get_game_info():
+	while True: #needs work here
+	try:
+		scoreboard_jsonp_web = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
+	except (requests.ConnectionError): #Catch these errors
+		print ("Could not get response from NHL.com trying again...")
+		time.sleep(5)
+		continue
+	except(requests.HTTPError):
+		print ("HTTP Error when loading url. Please restart program. ")
+		sys.exit(0)
+	except(requests.Timeout):
+		print ("The request took too long to process and timed out. Trying again... ")
+		time.sleep(5)
+	except(socket.error):
+		print ("Could not get response from NHL.com trying again...")
+		time.sleep(5)
+	except(requests.RequestException):
+		print ("Unknown error. Please restart the program. ")
+		sys.exit(0)
+		
+	# We get back JSON data with some JS around it, gotta remove the JS
+	scoreboard_jsonp_data = scoreboard_jsonp_web.text
+	# Remove the leading JS
+	scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
+	# Remove the trailing ')'
+	scoreboard_json_data  = scoreboard_json_data[:-1]
+	#Send to the parse function and save the cleaned json data
+	scoreboard_json_data_clean = parse_json(scoreboard_json_data)
+	
+	print ("Start json parse")
+	for key in scoreboard_json_data_clean:
+		if key == 'games':
+			for game_info in scoreboard_json_data_clean[key]:
+				print ("DEBUG: Away team is %s " % game_info['atv'].title())
+				print ("DEBUG: Home team is %s " % game_info['htv'].title())
+				if ( game_info['atv'].title() == team ) or ( game_info['htv'].title() == team ):
+					# Assign more meaningful names
+					game_clock = game_info['ts']
+					status = game_info['bs']
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):
+						gc_id = game_info['id']
+						print ("DEBUG: Game ID: %d " % gc_id)
+						game_stage = game_info['tsc']
+						away_team_locale = game_info['atn']
+						away_team_name = game_info['atv'].title()
+						away_team_result = game_info['atc']
+						
+						home_team_locale = game_info['htn']
+						home_team_name = game_info['htv'].title()
+						home_team_result = game_info['htc']
+						
+						# Fix strange names / locales returned by NHL
+						away_team_locale = fix_locale(away_team_locale)
+						home_team_locale = fix_locale(home_team_locale)
+						away_team_name = fix_name(away_team_name)
+						home_team_name = fix_name(home_team_name)
+						
+						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 
 
 def setup_light():
@@ -314,9 +321,6 @@ def parse_arguments(argv):
 			print 'Help'
 			print_help()
 			sys.exit()
-		elif opt in ("-d", "--today-only"):
-			global show_today_only
-			show_today_only = True
 		elif opt in ("-t", "--team"):
 			global team
 			if arg in team_list:
