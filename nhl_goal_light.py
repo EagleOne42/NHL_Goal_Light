@@ -1,5 +1,7 @@
 team = 'Blues' #Set default team - will use this if the team option flag is not used
 
+#Need detection of no game today
+
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
 
@@ -111,6 +113,19 @@ team_playing = False
 #Away team variables
 away_old_score = 0
 
+#json_data_check = 1
+#game_clock = 0
+#status = ""
+#gc_id = 0
+#game_stage = ""
+#away_team_name = ""
+#away_team_result = ""
+#away_team_locale = ""
+#home_team_name = ""
+#home_team_result = ""
+#home_team_locale = ""
+#game_api_url = ""
+
 
 def main():
 	global refresh_time
@@ -119,6 +134,7 @@ def main():
 	global home_old_score
 	global away_old_score
 	global old_game_data
+	global todays_date
 	clear_screen()
 	
 	# Format dates to match NHL API style:
@@ -126,15 +142,17 @@ def main():
 	t = datetime.datetime.now()
 	todays_date = "" + t.strftime("%A") + " " + "%s/%s" % (t.month, t.day)
 	
-	# Yesterdays date
-	y =y = t - datetime.timedelta(days=1)
-	yesterdays_date = "" + y.strftime("%A") + " " + "%s/%s" % (y.month, y.day)
+	print ("DEBUG: Call find_game_info")
+	find_game_info()
 	
-	print ("DEBUG: Call get game info")
-	get_game_info()
 	
-	while True:
+	check_start_time()
+	
+	while 1:
+		check_live_game_score()
 		print ("End of main. ")
+		print ("GID is %s" % gc_id )
+		print ("URL: %s" % game_api_url)
 		time.sleep(10)
 
 
@@ -181,37 +199,61 @@ def fix_name(team_name):
 	return team_name
 
 
-def get_game_info():
-	while True: #needs work here
-	try:
-		scoreboard_jsonp_web = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
-	except (requests.ConnectionError): #Catch these errors
-		print ("Could not get response from NHL.com trying again...")
-		time.sleep(5)
-		continue
-	except(requests.HTTPError):
-		print ("HTTP Error when loading url. Please restart program. ")
-		sys.exit(0)
-	except(requests.Timeout):
-		print ("The request took too long to process and timed out. Trying again... ")
-		time.sleep(5)
-	except(socket.error):
-		print ("Could not get response from NHL.com trying again...")
-		time.sleep(5)
-	except(requests.RequestException):
-		print ("Unknown error. Please restart the program. ")
-		sys.exit(0)
-		
-	# We get back JSON data with some JS around it, gotta remove the JS
-	scoreboard_jsonp_data = scoreboard_jsonp_web.text
-	# Remove the leading JS
-	scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
-	# Remove the trailing ')'
-	scoreboard_json_data  = scoreboard_json_data[:-1]
-	#Send to the parse function and save the cleaned json data
-	scoreboard_json_data_clean = parse_json(scoreboard_json_data)
+def find_game_info():
+	global json_data_check
+	global game_clock
+	global status
+	global gc_id
+	global game_stage
+	global away_team_locale
+	global away_team_name
+	global away_team_result
+	global home_team_locale
+	global home_team_name
+	global home_team_result
+	global away_team_locale
+	global home_team_locale
+	global away_team_name
+	global home_team_name
+	global game_api_url
+	json_data_check = 1
 	
-	print ("Start json parse")
+	print ("DEBUG: find_game_info start - json check is %d" % json_data_check)
+	
+	while ( json_data_check != 0 ):
+		try:
+			scoreboard_jsonp_web = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
+		except (requests.ConnectionError): #Catch these errors
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.HTTPError):
+			print ("HTTP Error when loading url. Please restart program. ")
+			sys.exit(0)
+		except(requests.Timeout):
+			print ("The request took too long to process and timed out. Trying again... ")
+			time.sleep(5)
+		except(socket.error):
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.RequestException):
+			print ("Unknown error. Please restart the program. ")
+			sys.exit(0)
+			
+		# We get back JSON data with some JS around it, gotta remove the JS
+		#DEBUGscoreboard_jsonp_data = scoreboard_jsonp_web.text
+		#DEBUG
+		with open('test_files/RegularSeasonScoreboardv3_bad.jsonp', 'r') as file_json:
+			scoreboard_jsonp_data=file_json.read()
+		#DEBUG
+		# Remove the leading JS
+		scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
+		# Remove the trailing ')'
+		scoreboard_json_data  = scoreboard_json_data[:-1]
+		#Send to the parse function and save the cleaned json data
+		print ("Start json parse call")
+		scoreboard_json_data_clean = parse_json(scoreboard_json_data)
+		
+	print ("Start json search and assign")
 	for key in scoreboard_json_data_clean:
 		if key == 'games':
 			for game_info in scoreboard_json_data_clean[key]:
@@ -240,6 +282,16 @@ def get_game_info():
 						home_team_name = fix_name(home_team_name)
 						
 						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
+
+
+def check_start_time():
+	print ("Start check_start_time")
+	
+
+
+def check_live_game_score():
+	print ("Start check_live_game_score")
+	
 
 
 def setup_light():
@@ -337,13 +389,19 @@ def parse_arguments(argv):
 
 
 def parse_json(json_input):
+	global json_data_check
 	try:
-		return json.loads(json_input)
+		print ("json_data_check is %d" % json_data_check)
+		parsed_json = json.loads(json_input)
 	except ValueError as e:
-		print 'Using last file - Bad JSON data'
+		print 'Bad JSON data'
 		print('invalid json: %s' % e)
 		time.sleep(1)
-		return old_game_data
+		json_data_check = 1
+		return 1
+	else:
+		json_data_check = 0
+		return parsed_json
 
 
 if __name__ == '__main__':
@@ -355,7 +413,8 @@ if __name__ == '__main__':
 		parse_arguments(sys.argv[1:])
 		
 		# Run the setup light
-		setup_light()
+		print ("DEBUG: disable setup_light")
+		#DEBUGsetup_light()
 		
 		# Start the main loop
 		main()
