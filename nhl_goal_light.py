@@ -4,6 +4,7 @@ team = 'Blues' #Set default team - will use this if the team option flag is not 
 #Need detection of no game today
 #Blue jackets not working due to name fix required
 #Change to use .title() for team names (input can be different case
+#On ice players and last play need to have the long json vs the short from before the game to work.
 
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
@@ -116,19 +117,6 @@ team_playing = False
 #Away team variables
 away_old_score = 0
 
-#json_data_check = 1
-#game_clock = 0
-#status = ""
-#gc_id = 0
-#game_stage = ""
-#away_team_name = ""
-#away_team_result = ""
-#away_team_locale = ""
-#home_team_name = ""
-#home_team_result = ""
-#home_team_locale = ""
-#game_api_url = ""
-
 
 def main():
 	global refresh_time
@@ -147,7 +135,6 @@ def main():
 	
 	print ("DEBUG: Call find_game_info")
 	find_game_info()
-	
 	
 	check_start_time()
 	
@@ -168,6 +155,15 @@ def main():
 		print ("away_team_result: %s" % away_team_result)
 		print ("GID is %s" % gc_id )
 		print ("URL: %s" % game_api_url)
+		print ("home_team_score: %s" % home_team_score)
+		print ("home_team_shots: %s" % home_team_shots)
+		#print ("home_team_on_ice: %s" % home_team_on_ice)
+		print ("away_team_score: %s" % away_team_score)
+		print ("away_team_shots: %s" % away_team_shots)
+		#print ("away_team_on_ice: %s" % away_team_on_ice)
+		#print ("last_play: %s" % last_play)
+		print ("END OF DEBUG OUTPUT")
+
 		time.sleep(10)
 
 
@@ -301,8 +297,67 @@ def check_start_time():
 
 
 def check_live_game_score():
+	global json_data_check
+	global home_team_score
+	global home_team_shots
+	global home_team_on_ice
+	global away_team_score
+	global away_team_shots
+	global away_team_on_ice
+	global last_play
+
 	print ("Start check_live_game_score")
+	json_data_check = 1
 	
+	while ( json_data_check != 0 ):
+		try:
+			game_jsonp_web = requests.get(game_api_url, headers=api_headers) #making sure there is a connection with the API
+		except(requests.ConnectionError): #Catch these errors
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.HTTPError):
+			print ("HTTP Error when loading url. Please restart program. ")
+			sys.exit(0)
+		except(requests.Timeout):
+			print ("The request took too long to process and timed out. Trying again... ")
+			time.sleep(5)
+		except(socket.error):
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.RequestException):
+			print ("Unknown error. Please restart the program. ")
+			sys.exit(0)
+			
+		# We get back JSON data with some JS around it, gotta remove the JS
+		game_jsonp_data = game_jsonp_web.text
+		#DEBUG
+		#with open('test_files/gcsb_bad.jsonp', 'r') as file_json:
+		#	game_json_data=file_json.read()
+		#DEBUG
+		
+		# Remove the leading JS
+		game_json_data = game_jsonp_data.replace('GCSB.load(', '')
+		
+		# Remove the trailing ')'
+		game_json_data  = game_json_data[:-1]
+		print("Game ID: %s" % gc_id)
+		
+		game_json_data_clean = parse_json(game_json_data)
+		
+	print ("Start json game data assign")
+	home_dict = game_json_data_clean['h']
+	away_dict = game_json_data_clean['a']
+	#le_dict = game_json_data_clean['le']
+
+	home_team_score = home_dict['tot']['g']
+	home_team_shots = home_dict['tot']['s']
+	#home_team_on_ice = home_dict['oi']
+
+	away_team_score = away_dict['tot']['g']
+	away_team_shots = away_dict['tot']['s']
+	#away_team_on_ice = away_dict['oi']
+	
+	#last_play = le_dict['desc']
 
 
 def setup_light():
