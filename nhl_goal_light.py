@@ -1,6 +1,9 @@
 team = 'Blues' #Set default team - will use this if the team option flag is not used
 
+#Known issues and things todo
 #Need detection of no game today
+#Blue jackets not working due to name fix required
+#Change to use .title() for team names (input can be different case
 
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
@@ -151,6 +154,18 @@ def main():
 	while 1:
 		check_live_game_score()
 		print ("End of main. ")
+		print
+		print ("DEBUG INFO:")
+		print ("json_data_check: %s" % json_data_check)
+		print ("game_clock: %s" % game_clock)
+		print ("status: %s" % status)
+		print ("game_stage: %s" % game_stage)
+		print ("home_team_name: %s" % home_team_name)
+		print ("home_team_locale: %s" % home_team_locale)
+		print ("home_team_result: %s" % home_team_result)
+		print ("away_team_name: %s" % away_team_name)
+		print ("away_team_locale: %s" % away_team_locale)
+		print ("away_team_result: %s" % away_team_result)
 		print ("GID is %s" % gc_id )
 		print ("URL: %s" % game_api_url)
 		time.sleep(10)
@@ -196,7 +211,7 @@ def fix_name(team_name):
 	if 'leafs' in team_name:
 		return 'Maple Leafs'
 	
-	return team_name
+	return team_name.title()
 
 
 def find_game_info():
@@ -205,16 +220,12 @@ def find_game_info():
 	global status
 	global gc_id
 	global game_stage
-	global away_team_locale
-	global away_team_name
-	global away_team_result
-	global home_team_locale
 	global home_team_name
+	global home_team_locale
 	global home_team_result
-	global away_team_locale
-	global home_team_locale
 	global away_team_name
-	global home_team_name
+	global away_team_locale
+	global away_team_result
 	global game_api_url
 	json_data_check = 1
 	
@@ -240,10 +251,10 @@ def find_game_info():
 			sys.exit(0)
 			
 		# We get back JSON data with some JS around it, gotta remove the JS
-		#DEBUGscoreboard_jsonp_data = scoreboard_jsonp_web.text
+		scoreboard_jsonp_data = scoreboard_jsonp_web.text
 		#DEBUG
-		with open('test_files/RegularSeasonScoreboardv3_bad.jsonp', 'r') as file_json:
-			scoreboard_jsonp_data=file_json.read()
+		#with open('test_files/RegularSeasonScoreboardv3_bad.jsonp', 'r') as file_json:
+		#	scoreboard_jsonp_data=file_json.read()
 		#DEBUG
 		# Remove the leading JS
 		scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
@@ -259,7 +270,7 @@ def find_game_info():
 			for game_info in scoreboard_json_data_clean[key]:
 				print ("DEBUG: Away team is %s " % game_info['atv'].title())
 				print ("DEBUG: Home team is %s " % game_info['htv'].title())
-				if ( game_info['atv'].title() == team ) or ( game_info['htv'].title() == team ):
+				if ( fix_name(game_info['atv']) == team ) or ( fix_name(game_info['htv']) == team ):
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
