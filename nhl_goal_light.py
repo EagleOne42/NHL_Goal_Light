@@ -136,10 +136,11 @@ def main():
 	print ("DEBUG: Call find_game_info")
 	find_game_info()
 	
-	check_game_time()
+	#check_game_time()
 	
 	while 1:
 		check_live_game_score()
+		check_game_time()
 		print ("End of main. ")
 		print
 		print ("DEBUG INFO:")
@@ -294,78 +295,76 @@ def find_game_info():
 def check_game_time():
 	print ("Start check_game_time")
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
-								
-								# Different displays for different states of game:
-								# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
-								# Game from today finished, ex: TODAY (FINAL 2nd OT)
-								if 'FINAL' in status:
-									if yesterdays_date in game_clock.title():
-										header_text += '\nYESTERDAY, ' + game_clock + ' '
-									elif todays_date in game_clock.title() or 'TODAY' in game_clock:
-										header_text += '\nTODAY '
-									header_text += '(' + status + ')'
-								
-								# Upcoming game, ex: TUESDAY 4/21, 7:00 PM EST)
-								elif 'DAY' in game_clock:
-									header_text += Fore.YELLOW + '\n(' + game_clock + ', ' + status + ' EST)' + Fore.RESET
-							
-								# Last 5 minutes of game and overtime, ex: (1:59 3rd PERIOD) *in red font*
-								elif 'critical' in game_stage:
-									header_text += '\n(' + Fore.RED + game_clock + ' PERIOD' + Fore.RESET + ')'
-							
-							
-								# Any other time in game, ex: (10:34 1st PERIOD)
-								else:
-									header_text += Fore.YELLOW + '\n(' + game_clock + ' PERIOD)' + Style.RESET_ALL
-							
-							
-								print(header_text)
-							
-								# Highlight the winner of finished games in green, and games underway in blue:
-								# Away team wins
-								if away_team_result == 'winner':
-									#print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + away_team_score + Style.RESET_ALL)
-									print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + str(away_team_score) + Style.RESET_ALL)
-									print(home_team_name + ': ' + str(home_team_score))
-							
-							
-								# Home team wins
-								elif home_team_result == 'winner':
-									print(away_team_name + ': ' + str(away_team_score))
-									print(Style.BRIGHT + Fore.GREEN + home_team_name + ': ' + str(home_team_score) + Style.RESET_ALL)
-							
-								# Game still underway
-								elif 'progress' in game_stage or 'critical' in game_stage:
-									print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
-									print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
-									game_current(home_team_name,home_team_score,game_clock,status) 
-									game_current(away_team_name,away_team_score,game_clock,status)
-									
-								# Game hasn't yet started
-								else:
-									print(away_team_name + ': ' + str(away_team_score))
-									print(home_team_name + ': ' + str(home_team_score))
-									game_current(home_team_name,home_team_score,game_clock,status)
-									game_current(away_team_name,away_team_score,game_clock,status)
-								print('')
-								if ('FINAL' in status) and (away_team_name == team or home_team_name == team) and (yesterdays_date in game_clock.title() or todays_date in game_clock.title() ): #Game over, no need to refresh every minute
-									print "Game over!"
-									refresh_time = 21600
-									team_playing = False
-									home_old_score = 0 
-									away_old_score = 0
-									print "Refresh in: " + str(refresh_time) + " seconds (6 hours)"
-									print "Team playing: " + str(team_playing)
-									print ""
-								break
-								
-			old_game_data = scoreboard_json_data_clean
-			if team_playing == False:
-				print ("Current time: " + str(datetime.datetime.now()))
-				refresh_time = 21600 # 6 hours
-				print team + " are not playing. Refreshing in " + str(refresh_time) + " seconds (6 hours)."
-			# Perfrom the refresh
-			time.sleep(refresh_time)
+
+# Different displays for different states of game:
+	# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
+	# Game from today finished, ex: TODAY (FINAL 2nd OT)
+	if 'FINAL' in status:
+		if yesterdays_date in game_clock.title():
+			header_text += '\nYESTERDAY, ' + game_clock + ' '
+		elif todays_date in game_clock.title() or 'TODAY' in game_clock:
+			header_text += '\nTODAY '
+		header_text += '(' + status + ')'
+		
+	# Upcoming game, ex: TUESDAY 4/21, 7:00 PM EST)
+	elif 'DAY' in game_clock:
+		header_text += Fore.YELLOW + '\n(' + game_clock + ', ' + status + ' EST)' + Fore.RESET
+		
+	# Last 5 minutes of game and overtime, ex: (1:59 3rd PERIOD) *in red font*
+	elif 'critical' in game_stage:
+		header_text += '\n(' + Fore.RED + game_clock + ' PERIOD' + Fore.RESET + ')'
+		
+	# Any other time in game, ex: (10:34 1st PERIOD)
+	else:
+		header_text += Fore.YELLOW + '\n(' + game_clock + ' PERIOD)' + Style.RESET_ALL
+		
+		
+	print(header_text)
+	
+	# Highlight the winner of finished games in green, and games underway in blue:
+	# Away team wins
+	if away_team_result == 'winner':
+		#print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + away_team_score + Style.RESET_ALL)
+		print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + str(away_team_score) + Style.RESET_ALL)
+		print(home_team_name + ': ' + str(home_team_score))
+		
+		
+	# Home team wins
+	elif home_team_result == 'winner':
+		print(away_team_name + ': ' + str(away_team_score))
+		print(Style.BRIGHT + Fore.GREEN + home_team_name + ': ' + str(home_team_score) + Style.RESET_ALL)
+		
+	# Game still underway
+	elif 'progress' in game_stage or 'critical' in game_stage:
+		print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
+		print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
+		#game_current(home_team_name,home_team_score,game_clock,status) 
+		#game_current(away_team_name,away_team_score,game_clock,status)
+		
+	# Game hasn't yet started
+	else:
+		print(away_team_name + ': ' + str(away_team_score))
+		print(home_team_name + ': ' + str(home_team_score))
+		#game_current(home_team_name,home_team_score,game_clock,status)
+		#game_current(away_team_name,away_team_score,game_clock,status)
+	print('')
+	if ('FINAL' in status) and (away_team_name == team or home_team_name == team) and (yesterdays_date in game_clock.title() or todays_date in game_clock.title() ): #Game over, no need to refresh every minute
+		print "Game over!"
+		refresh_time = 21600
+		team_playing = False
+		home_old_score = 0 
+		away_old_score = 0
+		print "Refresh in: " + str(refresh_time) + " seconds (6 hours)"
+		print "Team playing: " + str(team_playing)
+		print ""
+		
+		
+	#if team_playing == False:
+	#	print ("Current time: " + str(datetime.datetime.now()))
+	#	refresh_time = 21600 # 6 hours
+	#	print team + " are not playing. Refreshing in " + str(refresh_time) + " seconds (6 hours)."
+	#	# Perfrom the refresh
+		time.sleep(refresh_time)
 
 
 
