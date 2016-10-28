@@ -158,11 +158,11 @@ def main():
 		print ("URL: %s" % game_api_url)
 		print ("home_team_score: %s" % home_team_score)
 		print ("home_team_shots: %s" % home_team_shots)
-		#print ("home_team_on_ice: %s" % home_team_on_ice)
+		print ("home_team_on_ice: %s" % home_team_on_ice)
 		print ("away_team_score: %s" % away_team_score)
 		print ("away_team_shots: %s" % away_team_shots)
-		#print ("away_team_on_ice: %s" % away_team_on_ice)
-		#print ("last_play: %s" % last_play)
+		print ("away_team_on_ice: %s" % away_team_on_ice)
+		print ("last_play: %s" % last_play)
 		print ("END OF DEBUG OUTPUT")
 
 		time.sleep(10)
@@ -385,7 +385,7 @@ def check_live_game_score():
 		try:
 			game_jsonp_web = requests.get(game_api_url, headers=api_headers) #making sure there is a connection with the API
 		except(requests.ConnectionError): #Catch these errors
-			print ("Could not get response from NHL.com trying again...")
+			print ("Connection Error - Could not get response from NHL.com trying again...")
 			time.sleep(5)
 		except(requests.HTTPError):
 			print ("HTTP Error when loading url. Please restart program. ")
@@ -394,7 +394,7 @@ def check_live_game_score():
 			print ("The request took too long to process and timed out. Trying again... ")
 			time.sleep(5)
 		except(socket.error):
-			print ("Could not get response from NHL.com trying again...")
+			print ("Socket Error - Could not get response from NHL.com trying again...")
 			time.sleep(5)
 		except(requests.RequestException):
 			print ("Unknown error. Please restart the program. ")
@@ -419,17 +419,17 @@ def check_live_game_score():
 	print ("Start json game data assign")
 	home_dict = game_json_data_clean['h']
 	away_dict = game_json_data_clean['a']
-	#le_dict = game_json_data_clean['le']
+	le_dict = game_json_data_clean['le']
 
 	home_team_score = home_dict['tot']['g']
 	home_team_shots = home_dict['tot']['s']
-	#home_team_on_ice = home_dict['oi']
+	home_team_on_ice = home_dict['oi']
 
 	away_team_score = away_dict['tot']['g']
 	away_team_shots = away_dict['tot']['s']
-	#away_team_on_ice = away_dict['oi']
+	away_team_on_ice = away_dict['oi']
 	
-	#last_play = le_dict['desc']
+	last_play = le_dict['desc']
 
 
 def setup_light():

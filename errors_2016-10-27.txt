@@ -1,0 +1,112 @@
+DEBUG INFO:
+json_data_check: 0
+game_clock: 20:00 1st
+status: LIVE
+game_stage: progress
+home_team_name: Blues
+home_team_locale: St Louis
+home_team_result: progress
+away_team_name: Red Wings
+away_team_locale: Detroit
+away_team_result: progress
+GID is 2016020103
+URL: http://live.nhle.com/GameData/20162017/2016020103/gc/gcsb.jsonp
+home_team_score: 0
+home_team_shots: 0
+home_team_on_ice: [21, 22, 34, 41, 57, 64]
+away_team_score: 0
+away_team_shots: 1
+away_team_on_ice: [2, 8, 34, 43, 48, 72]
+END OF DEBUG OUTPUT
+Start check_live_game_score
+Game ID: 2016020103
+json_data_check is 1
+Start json game data assign
+Start check_game_time
+Detroit Red Wings @ St Louis Blues
+(20:00 1st PERIOD)
+Red Wings: 0
+Blues: 0
+
+End of main.
+
+DEBUG INFO:
+json_data_check: 0
+game_clock: 20:00 1st
+status: LIVE
+game_stage: progress
+home_team_name: Blues
+home_team_locale: St Louis
+home_team_result: progress
+away_team_name: Red Wings
+away_team_locale: Detroit
+away_team_result: progress
+GID is 2016020103
+URL: http://live.nhle.com/GameData/20162017/2016020103/gc/gcsb.jsonp
+home_team_score: 0
+home_team_shots: 0
+home_team_on_ice: [21, 22, 34, 41, 57, 64]
+away_team_score: 0
+away_team_shots: 1
+away_team_on_ice: [2, 8, 34, 43, 48, 72]
+END OF DEBUG OUTPUT
+Start check_live_game_score
+Could not get response from NHL.com trying again...
+Running GPIO Cleanup
+Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 558, in <module>
+    main()
+  File "nhl_goal_light.py", line 142, in main
+    check_live_game_score()
+  File "nhl_goal_light.py", line 404, in check_live_game_score
+    game_jsonp_data = game_jsonp_web.text
+UnboundLocalError: local variable 'game_jsonp_web' referenced before assignment
+
+
+
+
+Detroit Red Wings @ St Louis Blues
+(01:47 1st PERIOD)
+Red Wings: 0
+Blues: 0
+
+End of main.
+
+DEBUG INFO:
+json_data_check: 0
+game_clock: 01:47 1st
+status: LIVE
+game_stage: progress
+home_team_name: Blues
+home_team_locale: St Louis
+home_team_result: progress
+away_team_name: Red Wings
+away_team_locale: Detroit
+away_team_result: progress
+GID is 2016020103
+URL: http://live.nhle.com/GameData/20162017/2016020103/gc/gcsb.jsonp
+home_team_score: 0
+home_team_shots: 14
+home_team_on_ice: [17, 20, 22, 26, 34, 91]
+away_team_score: 0
+away_team_shots: 4
+away_team_on_ice: [34, 43, 51, 52, 65]
+last_play: 1/19:59 - Wrist shot by Stastny (STL)
+END OF DEBUG OUTPUT
+Start check_live_game_score
+Game ID: 2016020103
+json_data_check is 1
+Start json game data assign
+Running GPIO Cleanup
+Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 558, in <module>
+    main()
+  File "nhl_goal_light.py", line 142, in main
+    check_live_game_score()
+  File "nhl_goal_light.py", line 422, in check_live_game_score
+    le_dict = game_json_data_clean['le']
+KeyError: 'le'
+jono@raspberry-pi1 ~/git_repos/NHL_Goal_Light $
+
