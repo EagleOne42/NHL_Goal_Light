@@ -92,21 +92,21 @@ import time
 import requests
 import getopt
 import socket
-print('Disabled GPIO')#gpio_disable try:
-print('Disabled GPIO')#gpio_disable 	import RPi.GPIO as GPIO
-print('Disabled GPIO')#gpio_disable except RuntimeError:
-print('Disabled GPIO')#gpio_disable 	print ("Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
+print('DEBUG: Disabled GPIO')#gpio_disable try:
+print('DEBUG: Disabled GPIO')#gpio_disable 	import RPi.GPIO as GPIO
+print('DEBUG: Disabled GPIO')#gpio_disable except RuntimeError:
+print('DEBUG: Disabled GPIO')#gpio_disable 	print ("Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
 
-print('Disabled GPIO')#gpio_disable GPIO.setmode(GPIO.BOARD) #Use the pin number, not the GPIO name - example use "7" for pin #7 aka GPIO4
-print('Disabled GPIO')#gpio_disable goal_light_gpio_pins = [7] #For multiple lights enter the gpio like this - [7,11,13,15,16]
-print('Disabled GPIO')#gpio_disable GPIO.setup(goal_light_gpio_pins, GPIO.OUT) #Set the Raspberry Pi GPIO pins as output to activate relays/leds
+print('DEBUG: Disabled GPIO')#gpio_disable GPIO.setmode(GPIO.BOARD) #Use the pin number, not the GPIO name - example use "7" for pin #7 aka GPIO4
+print('DEBUG: Disabled GPIO')#gpio_disable goal_light_gpio_pins = [7] #For multiple lights enter the gpio like this - [7,11,13,15,16]
+print('DEBUG: Disabled GPIO')#gpio_disable GPIO.setup(goal_light_gpio_pins, GPIO.OUT) #Set the Raspberry Pi GPIO pins as output to activate relays/leds
 
 target = open('logs/goal_log.txt', 'a')
 target.write('Script startup at %s\n' % str(datetime.datetime.now()))
 target.close()
 
 refresh_time = 3600  # Default to 1 hours Refresh time (seconds), NHL API refresh is every 60 seconds
-api_url = 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp' #NHL JSON API with the game IDs and basic info
+scoreboard_api_url = 'http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp' #NHL JSON API with the game IDs and basic info
 #'game_api_url' is defined in the code below to pull the score for each game - should update more often then the 'api_url'
 api_headers = {'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36', 'Referer': 'http://www.nhl.com/ice/scores.htm'}
 
@@ -136,11 +136,11 @@ def main():
 	print ("DEBUG: Call find_game_info")
 	find_game_info()
 	
-	#check_game_time()
+	check_game_time()
 	
 	while 1:
 		check_live_game_score()
-		check_game_time()
+		#check_game_time()
 		print ("End of main. ")
 		print
 		print ("DEBUG INFO:")
@@ -158,13 +158,12 @@ def main():
 		print ("URL: %s" % game_api_url)
 		print ("home_team_score: %s" % home_team_score)
 		print ("home_team_shots: %s" % home_team_shots)
-		print ("home_team_on_ice: %s" % home_team_on_ice)
+		#print ("home_team_on_ice: %s" % home_team_on_ice)
 		print ("away_team_score: %s" % away_team_score)
 		print ("away_team_shots: %s" % away_team_shots)
-		print ("away_team_on_ice: %s" % away_team_on_ice)
-		print ("last_play: %s" % last_play)
+		#print ("away_team_on_ice: %s" % away_team_on_ice)
+		#print ("last_play: %s" % last_play)
 		print ("END OF DEBUG OUTPUT")
-
 		time.sleep(10)
 
 
@@ -212,6 +211,7 @@ def fix_name(team_name):
 
 
 def find_game_info():
+	print ("DEBUG: find_game_info start")
 	global json_data_check
 	global game_clock
 	global status
@@ -226,41 +226,9 @@ def find_game_info():
 	global game_api_url
 	json_data_check = 1
 	
-	print ("DEBUG: find_game_info start - json check is %d" % json_data_check)
+	#Download jsonp and save clean and parsed data to 
+	scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
 	
-	while ( json_data_check != 0 ):
-		try:
-			scoreboard_jsonp_web = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
-		except (requests.ConnectionError): #Catch these errors
-			print ("Could not get response from NHL.com trying again...")
-			time.sleep(5)
-		except(requests.HTTPError):
-			print ("HTTP Error when loading url. Please restart program. ")
-			sys.exit(0)
-		except(requests.Timeout):
-			print ("The request took too long to process and timed out. Trying again... ")
-			time.sleep(5)
-		except(socket.error):
-			print ("Could not get response from NHL.com trying again...")
-			time.sleep(5)
-		except(requests.RequestException):
-			print ("Unknown error. Please restart the program. ")
-			sys.exit(0)
-			
-		# We get back JSON data with some JS around it, gotta remove the JS
-		scoreboard_jsonp_data = scoreboard_jsonp_web.text
-		#DEBUG
-		#with open('test_files/RegularSeasonScoreboardv3_bad.jsonp', 'r') as file_json:
-		#	scoreboard_jsonp_data=file_json.read()
-		#DEBUG
-		# Remove the leading JS
-		scoreboard_json_data = scoreboard_jsonp_data.replace('loadScoreboard(', '')
-		# Remove the trailing ')'
-		scoreboard_json_data  = scoreboard_json_data[:-1]
-		#Send to the parse function and save the cleaned json data
-		print ("Start json parse call")
-		scoreboard_json_data_clean = parse_json(scoreboard_json_data)
-		
 	print ("Start json search and assign")
 	for key in scoreboard_json_data_clean:
 		if key == 'games':
@@ -271,7 +239,7 @@ def find_game_info():
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or ('FINAL' in status and (todays_date in game_clock.title() or 'TODAY' in game_clock)) ):
 						gc_id = game_info['id']
 						print ("DEBUG: Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
@@ -292,11 +260,61 @@ def find_game_info():
 						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 
 
+def get_json_from_nhl(api_url, pretext_to_remove):
+	print "DEBUG: Starting get_json_from_nhl"
+	global json_data_check
+	json_data_check = 1
+	
+	while ( json_data_check != 0 ):
+		jsonp_raw = "set to blank"
+		try:
+			jsonp_raw = requests.get(api_url, headers=api_headers) #making sure there is a connection with the API
+		except (requests.ConnectionError): #Catch these errors
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.HTTPError):
+			print ("HTTP Error when loading url. Please restart program. ")
+			sys.exit(0)
+		except(requests.Timeout):
+			print ("The request took too long to process and timed out. Trying again... ")
+			time.sleep(5)
+		except(socket.error):
+			print ("Could not get response from NHL.com trying again...")
+			time.sleep(5)
+		except(requests.RequestException):
+			print ("Unknown error. Please restart the program. ")
+			sys.exit(0)
+			
+		# We get back JSON data with some JS around it, gotta remove the JS
+		jsonp_text = jsonp_raw.text
+		#DEBUG
+		#with open('test_files/RegularSeasonScoreboardv3_custom.jsonp', 'r') as file_json:
+		#	jsonp_text=file_json.read()
+		#DEBUG
+		# Remove the leading JS
+		json_data = jsonp_text.replace(pretext_to_remove, '')
+		# Remove the trailing ')'
+		json_data  = json_data[:-1]
+		#Send to the parse function and save the cleaned json data
+		print ("Start json parse call")
+		json_data_clean = parse_json(json_data)
+		return json_data_clean
+
+
 def check_game_time():
-	print ("Start check_game_time")
+	print ("DEBUG: Start check_game_time")
+	try:
+		gc_id
+	except NameError:
+		print ("gc_id not found - looks like there is no game today")
+		time.sleep(10)
+		return
+	else:
+		print ("gc_id found - looks like there is a game today")
+		
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
 
-# Different displays for different states of game:
+	# Different displays for different states of game:
 	# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
 	# Game from today finished, ex: TODAY (FINAL 2nd OT)
 	if 'FINAL' in status:
@@ -369,7 +387,6 @@ def check_game_time():
 
 
 def check_live_game_score():
-	global json_data_check
 	global home_team_score
 	global home_team_shots
 	global home_team_on_ice
@@ -377,59 +394,26 @@ def check_live_game_score():
 	global away_team_shots
 	global away_team_on_ice
 	global last_play
-
-	print ("Start check_live_game_score")
-	json_data_check = 1
 	
-	while ( json_data_check != 0 ):
-		try:
-			game_jsonp_web = requests.get(game_api_url, headers=api_headers) #making sure there is a connection with the API
-		except(requests.ConnectionError): #Catch these errors
-			print ("Connection Error - Could not get response from NHL.com trying again...")
-			time.sleep(5)
-		except(requests.HTTPError):
-			print ("HTTP Error when loading url. Please restart program. ")
-			sys.exit(0)
-		except(requests.Timeout):
-			print ("The request took too long to process and timed out. Trying again... ")
-			time.sleep(5)
-		except(socket.error):
-			print ("Socket Error - Could not get response from NHL.com trying again...")
-			time.sleep(5)
-		except(requests.RequestException):
-			print ("Unknown error. Please restart the program. ")
-			sys.exit(0)
-			
-		# We get back JSON data with some JS around it, gotta remove the JS
-		game_jsonp_data = game_jsonp_web.text
-		#DEBUG
-		#with open('test_files/gcsb_bad.jsonp', 'r') as file_json:
-		#	game_json_data=file_json.read()
-		#DEBUG
-		
-		# Remove the leading JS
-		game_json_data = game_jsonp_data.replace('GCSB.load(', '')
-		
-		# Remove the trailing ')'
-		game_json_data  = game_json_data[:-1]
-		print("Game ID: %s" % gc_id)
-		
-		game_json_data_clean = parse_json(game_json_data)
-		
+	print ("Start check_live_game_score")
+	
+	game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+	print("Game ID: %s" % gc_id)
+	
 	print ("Start json game data assign")
 	home_dict = game_json_data_clean['h']
 	away_dict = game_json_data_clean['a']
-	le_dict = game_json_data_clean['le']
-
+	#le_dict = game_json_data_clean['le']
+	
 	home_team_score = home_dict['tot']['g']
 	home_team_shots = home_dict['tot']['s']
-	home_team_on_ice = home_dict['oi']
-
+	#home_team_on_ice = home_dict['oi']
+	
 	away_team_score = away_dict['tot']['g']
 	away_team_shots = away_dict['tot']['s']
-	away_team_on_ice = away_dict['oi']
+	#away_team_on_ice = away_dict['oi']
 	
-	last_play = le_dict['desc']
+	#last_play = le_dict['desc']
 
 
 def setup_light():
