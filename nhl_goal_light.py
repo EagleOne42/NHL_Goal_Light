@@ -113,7 +113,6 @@ api_headers = {'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6
 
 #Home team variables
 home_old_score = 0
-team_playing = False
 
 #Away team variables
 away_old_score = 0
@@ -137,35 +136,37 @@ def main():
 	print ("DEBUG: Call find_game_info")
 	find_game_info()
 	
-	check_game_time()
-	
 	while 1:
-		check_live_game_score()
-		#check_game_time()
-		print ("End of main. ")
-		print
-		print ("DEBUG INFO:")
-		print ("json_data_check: %s" % json_data_check)
-		print ("game_clock: %s" % game_clock)
-		print ("status: %s" % status)
-		print ("game_stage: %s" % game_stage)
-		print ("home_team_name: %s" % home_team_name)
-		print ("home_team_locale: %s" % home_team_locale)
-		print ("home_team_result: %s" % home_team_result)
-		print ("away_team_name: %s" % away_team_name)
-		print ("away_team_locale: %s" % away_team_locale)
-		print ("away_team_result: %s" % away_team_result)
-		print ("GID is %s" % gc_id )
-		print ("URL: %s" % game_api_url)
-		print ("home_team_score: %s" % home_team_score)
-		print ("home_team_shots: %s" % home_team_shots)
-		#print ("home_team_on_ice: %s" % home_team_on_ice)
-		print ("away_team_score: %s" % away_team_score)
-		print ("away_team_shots: %s" % away_team_shots)
-		#print ("away_team_on_ice: %s" % away_team_on_ice)
-		#print ("last_play: %s" % last_play)
-		print ("END OF DEBUG OUTPUT")
-		time.sleep(10)
+		check_game_time()
+		if ( game_today == 1 ):
+			check_live_game_score()
+			#check_game_time()
+			print ("End of main. ")
+			print
+			print ("DEBUG INFO:")
+			print ("json_data_check: %s" % json_data_check)
+			print ("game_clock: %s" % game_clock)
+			print ("status: %s" % status)
+			print ("game_stage: %s" % game_stage)
+			print ("home_team_name: %s" % home_team_name)
+			print ("home_team_locale: %s" % home_team_locale)
+			print ("home_team_result: %s" % home_team_result)
+			print ("away_team_name: %s" % away_team_name)
+			print ("away_team_locale: %s" % away_team_locale)
+			print ("away_team_result: %s" % away_team_result)
+			print ("GID is %s" % gc_id )
+			print ("URL: %s" % game_api_url)
+			print ("home_team_score: %s" % home_team_score)
+			print ("home_team_shots: %s" % home_team_shots)
+			#print ("home_team_on_ice: %s" % home_team_on_ice)
+			print ("away_team_score: %s" % away_team_score)
+			print ("away_team_shots: %s" % away_team_shots)
+			#print ("away_team_on_ice: %s" % away_team_on_ice)
+			#print ("last_play: %s" % last_play)
+			print ("END OF DEBUG OUTPUT")
+		refresh_time_min = (refresh_time / 60)
+		print ("Setting refresh_time to %d min" % refresh_time_min)
+		time.sleep(refresh_time)
 
 
 def clear_screen():
@@ -300,11 +301,15 @@ def get_json_from_nhl(api_url, pretext_to_remove):
 
 
 def check_game_time():
+	global game_today
+	global refresh_time
 	print ("DEBUG: Start check_game_time")
 	try:
 		gc_id
 	except NameError:
 		print ("gc_id not found - looks like there is no game today")
+		game_today = 0
+		refresh_time = 3600
 		time.sleep(10)
 		return
 	else:
