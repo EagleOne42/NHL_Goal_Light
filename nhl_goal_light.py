@@ -5,6 +5,7 @@ team = 'Blues' #Set default team - will use this if the team option flag is not 
 #Blue jackets not working due to name fix required
 #Change to use .title() for team names (input can be different case
 #On ice players and last play need to have the long json vs the short from before the game to work.
+#Back to back games will not work correctly
 
 #Main team list
 team_list = ('Avalanche', 'Blackhawks', 'Blue Jackets', 'Blues', 'Bruins', 'Canadiens', 'Canucks', 'Capitals', 'Coyotes', 'Devils', 'Ducks', 'Flames', 'Flyers', 'Hurricanes', 'Islanders', 'Jets', 'Kings', 'Lightning', 'Maple Leafs', 'Oilers', 'Panthers', 'Penguins', 'Predators', 'Rangers', 'Red Wings', 'Sabres', 'Senators', 'Sharks', 'Stars', 'Wild')
@@ -176,13 +177,9 @@ def clear_screen():
 
 def print_help():
 	print('Help:')
-	print('By default games from yesterday and today will be displayed.')
-	print('If you want to see games from just today run the program with ')
-	print('the "--today-only" flag.')
-	print('')
 	print('Teams can be specified by the \'-t\' or \'--team\'')
 	print('Example:')
-	print('python Scoreboard.py -t \'Maple Leafs\'')
+	print('python nhl_goal_light.py -t \'Maple Leafs\'')
 
 
 def fix_locale(team_locale):
@@ -190,6 +187,7 @@ def fix_locale(team_locale):
 	if 'NY ' in team_locale:
 		return 'New York'
 	
+	# Montreal has special characters
 	if 'Montr' in team_locale:
 		return 'Montreal'
 	
@@ -239,7 +237,7 @@ def find_game_info():
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or ('FINAL' in status and (todays_date in game_clock.title() or 'TODAY' in game_clock)) ):
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):
 						gc_id = game_info['id']
 						print ("DEBUG: Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
