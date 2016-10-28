@@ -309,7 +309,7 @@ def check_game_time():
 	except NameError:
 		print ("gc_id not found - looks like there is no game today")
 		game_today = 0
-		refresh_time = 3600
+		refresh_time = 5#3600
 		time.sleep(10)
 		return
 	else:
