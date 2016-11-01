@@ -16,7 +16,7 @@ api_url="http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp"
 #STL v CHI
 #GAME 1 - 2015030161
 
-game_list="2015030175 2015030166"
+game_list="2016020118"
 
 while [ true ]
 do
@@ -27,7 +27,7 @@ do
 	for game_id in $game_list ; do
 		echo "Pull Game ID: $game_id"
 		mkdir $game_id 2>/dev/null
-		curl http://live.nhle.com/GameData/20152016/$game_id/gc/gcsb.jsonp -H "{'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36', 'Referer': 'http://www.nhl.com/ice/scores.htm'}" -o $game_id/`date +%Y-%m-%d_%T`.gcsb.jsonp
+		curl http://live.nhle.com/GameData/20162017/$game_id/gc/gcsb.jsonp -H "{'Host': 'live.nhle.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36', 'Referer': 'http://www.nhl.com/ice/scores.htm'}" -o $game_id/`date +%Y-%m-%d_%T`.gcsb.jsonp
 	done
 done
 
