@@ -133,7 +133,6 @@ def main():
 	t = datetime.datetime.now()
 	todays_date = "" + t.strftime("%A") + " " + "%s/%s" % (t.month, t.day)
 	
-	print ("DEBUG: Call find_game_info")
 	find_game_info()
 	
 	while 1:
