@@ -126,6 +126,7 @@ def main():
 	global away_old_score
 	global old_game_data
 	global todays_date
+	global game_today
 	clear_screen()
 	
 	# Format dates to match NHL API style:
@@ -133,9 +134,8 @@ def main():
 	t = datetime.datetime.now()
 	todays_date = "" + t.strftime("%A") + " " + "%s/%s" % (t.month, t.day)
 	
-	find_game_info()
-	
 	while 1:
+		find_game_info()
 		check_game_time()
 		if ( game_today == 1 ):
 			check_live_game_score()
@@ -226,6 +226,7 @@ def find_game_info():
 	
 	#Download jsonp and save clean and parsed data to 
 	scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
+	#scoreboard_json_data_clean = 
 	
 	print ("Start json search and assign")
 	for key in scoreboard_json_data_clean:
@@ -309,7 +310,6 @@ def check_game_time():
 		print ("gc_id not found - looks like there is no game today")
 		game_today = 0
 		refresh_time = 5#3600
-		time.sleep(10)
 		return
 	else:
 		print ("gc_id found - looks like there is a game today")
@@ -320,10 +320,10 @@ def check_game_time():
 	# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
 	# Game from today finished, ex: TODAY (FINAL 2nd OT)
 	if 'FINAL' in status:
-		if yesterdays_date in game_clock.title():
-			header_text += '\nYESTERDAY, ' + game_clock + ' '
-		elif todays_date in game_clock.title() or 'TODAY' in game_clock:
-			header_text += '\nTODAY '
+		#if yesterdays_date in game_clock.title():
+		#	header_text += '\nYESTERDAY, ' + game_clock + ' '
+		#elif todays_date in game_clock.title() or 'TODAY' in game_clock:
+		header_text += '\nTODAY '
 		header_text += '(' + status + ')'
 		
 	# Upcoming game, ex: TUESDAY 4/21, 7:00 PM EST)
@@ -338,7 +338,6 @@ def check_game_time():
 	else:
 		header_text += Fore.YELLOW + '\n(' + game_clock + ' PERIOD)' + Style.RESET_ALL
 		
-		
 	print(header_text)
 	
 	# Highlight the winner of finished games in green, and games underway in blue:
@@ -347,7 +346,6 @@ def check_game_time():
 		#print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + away_team_score + Style.RESET_ALL)
 		print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + str(away_team_score) + Style.RESET_ALL)
 		print(home_team_name + ': ' + str(home_team_score))
-		
 		
 	# Home team wins
 	elif home_team_result == 'winner':
@@ -370,22 +368,9 @@ def check_game_time():
 	print('')
 	if ('FINAL' in status) and (away_team_name == team or home_team_name == team) and (yesterdays_date in game_clock.title() or todays_date in game_clock.title() ): #Game over, no need to refresh every minute
 		print "Game over!"
-		refresh_time = 21600
+		refresh_time = 3600
 		team_playing = False
-		home_old_score = 0 
-		away_old_score = 0
-		print "Refresh in: " + str(refresh_time) + " seconds (6 hours)"
-		print "Team playing: " + str(team_playing)
 		print ""
-		
-		
-	#if team_playing == False:
-	#	print ("Current time: " + str(datetime.datetime.now()))
-	#	refresh_time = 21600 # 6 hours
-	#	print team + " are not playing. Refreshing in " + str(refresh_time) + " seconds (6 hours)."
-	#	# Perfrom the refresh
-		time.sleep(refresh_time)
-
 
 
 def check_live_game_score():
@@ -485,7 +470,7 @@ def activate_goal_light():
 
 def parse_arguments(argv):
 	try:
-		opts, args = getopt.getopt(argv, "ht:d", ["help", "team=", "today-only"])
+		opts, args = getopt.getopt(argv, "ht:d", ["help", "team="])
 	except getopt.GetoptError:
 		print ''
 		print 'Invalid option'
@@ -505,7 +490,7 @@ def parse_arguments(argv):
 				try:
 					team = nhl_team_dict[arg]
 				except:
-					print 'Team name not in list.  Make sure to use single quote around name.'
+					print 'Team name not in list.  Make sure to use single quotes around name.'
 					print 'You can use team name, city/location, or the 3 letter name used by the NHL'
 					print "Example) For the St. Louis Blues you can use 'Blues' or 'St Louis' or 'St. Louis' or 'STL'"
 					print 'List of teams: %s' % (team_list,)

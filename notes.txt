@@ -1,0 +1,17 @@
+pull scoreboard json
+
+is there a game today:
+no - set refresh to 1 hour - wait and check for game again
+yes - set game id and other info
+
+game today is yes - find time
+is game in progress:
+yes - pull extended game data, display data and set refresh to 2 seconds
+
+is game over:
+yes - display final score and wait 1 hours and check again
+no - continue to find game time
+
+does game start in the future:
+yes - figure out how soon and set refresh accordinly
+no - error - missing something - open log and append json data and error and set refresh to 15 min and check again.
