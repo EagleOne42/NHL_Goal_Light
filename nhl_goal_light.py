@@ -244,9 +244,12 @@ def find_game_info():
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or 'FINAL' in status or 'PRE GAME' in game_clock):
+					print ("DEBUG: game_clock: %s" % game_clock.title())
+					print ("DEBUG: status: %s" % status)
+					
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):# or 'FINAL' in status or 'PRE GAME' in game_clock ):
 						gc_id = game_info['id']
-						print ("DEBUG: Game ID: %d " % gc_id)
+						print ("DEBUG: Team Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
 						away_team_locale = game_info['atn']
 						away_team_name = game_info['atv'].title()
@@ -317,7 +320,7 @@ def check_game_time():
 	except NameError:
 		print ("DEBUG: gc_id not found - looks like there is no game today")
 		game_today = 0
-		refresh_time = 5#3600
+		refresh_time = 3600
 		return
 	else:
 		print ("DEBUG: gc_id found - looks like there is a game today")
