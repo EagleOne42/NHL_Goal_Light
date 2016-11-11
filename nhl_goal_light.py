@@ -244,7 +244,7 @@ def find_game_info():
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or 'FINAL' in status or 'PRE GAME' in game_clock):
 						gc_id = game_info['id']
 						print ("DEBUG: Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
@@ -322,6 +322,7 @@ def check_game_time():
 		return
 	else:
 		print ("gc_id found - looks like there is a game today")
+		game_today = 1
 		
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
 	
@@ -364,10 +365,17 @@ def check_game_time():
 		#game_current(home_team_name,home_team_score,game_clock,status) 
 		#game_current(away_team_name,away_team_score,game_clock,status)
 		
+	elif (game_clock == "PRE GAME"): #30 minutes to game time
+		refresh_time = 60 #1 minute
+		print "Pre Game - It is almost game time!"
+		print "Refresh time: " + str(refresh_time) + " seconds (1 minute)"
+	
 	# Game hasn't yet started
 	else:
+		print ("Game hasn't yet started")
 		print(away_team_name + ': ' + str(away_team_score))
 		print(home_team_name + ': ' + str(home_team_score))
+		refresh_time = 900 #15min
 		#game_current(home_team_name,home_team_score,game_clock,status)
 		#game_current(away_team_name,away_team_score,game_clock,status)
 	print('')
