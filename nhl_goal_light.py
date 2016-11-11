@@ -140,7 +140,7 @@ def main():
 		if ( game_today == 1 ):
 			check_live_game_score()
 			#check_game_time()
-			print ("End of main. ")
+			print ("DEBUG: End of main. ")
 			print
 			print ("DEBUG INFO:")
 			print ("json_data_check: %s" % json_data_check)
@@ -162,7 +162,7 @@ def main():
 			print ("away_team_shots: %s" % away_team_shots)
 			#print ("away_team_on_ice: %s" % away_team_on_ice)
 			#print ("last_play: %s" % last_play)
-			print ("END OF DEBUG OUTPUT")
+			print ("DEBUG: END OF DEBUG OUTPUT")
 		refresh_time_min = (refresh_time / 60)
 		print ("Setting refresh_time to %d min" % refresh_time_min)
 		time.sleep(refresh_time)
@@ -227,13 +227,13 @@ def find_game_info():
 	json_data_check = 1
 	
 	#Download jsonp and save clean and parsed data to 
-	#scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
-	with open('test_files/RegularSeasonScoreboardv3_test.json', 'r') as file_json:
-		scoreboard_json_data_clean=file_json.read()
+	scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
+	#DEBUG TEST
+	#with open('test_files/RegularSeasonScoreboardv3_test.json', 'r') as file_json:
+	#	scoreboard_json_data_clean=file_json.read()
+	#scoreboard_json_data_clean = parse_json(scoreboard_json_data_clean)
 	
-	scoreboard_json_data_clean = parse_json(scoreboard_json_data_clean)
-	
-	print ("Start json search and assign")
+	print ("DEBUG: Start json search and assign")
 	print todays_date
 	for key in scoreboard_json_data_clean:
 		if key == 'games':
@@ -251,19 +251,18 @@ def find_game_info():
 						away_team_locale = game_info['atn']
 						away_team_name = game_info['atv'].title()
 						away_team_result = game_info['atc']
+						away_team_score = game_info['ats']
 						
 						home_team_locale = game_info['htn']
 						home_team_name = game_info['htv'].title()
 						home_team_result = game_info['htc']
+						home_team_score = game_info['hts']
 						
 						# Fix strange names / locales returned by NHL
 						away_team_locale = fix_locale(away_team_locale)
 						home_team_locale = fix_locale(home_team_locale)
 						away_team_name = fix_name(away_team_name)
 						home_team_name = fix_name(home_team_name)
-						
-						home_team_score = game_info['hts']
-						away_team_score = game_info['ats']
 						
 						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 
@@ -304,7 +303,7 @@ def get_json_from_nhl(api_url, pretext_to_remove):
 		# Remove the trailing ')'
 		json_data  = json_data[:-1]
 		#Send to the parse function and save the cleaned json data
-		print ("Start json parse call")
+		print ("DEBUG: Start json parse call")
 		json_data_clean = parse_json(json_data)
 		return json_data_clean
 
@@ -316,12 +315,12 @@ def check_game_time():
 	try:
 		gc_id
 	except NameError:
-		print ("gc_id not found - looks like there is no game today")
+		print ("DEBUG: gc_id not found - looks like there is no game today")
 		game_today = 0
 		refresh_time = 5#3600
 		return
 	else:
-		print ("gc_id found - looks like there is a game today")
+		print ("DEBUG: gc_id found - looks like there is a game today")
 		game_today = 1
 		
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
@@ -395,15 +394,16 @@ def check_live_game_score():
 	global away_team_on_ice
 	global last_play
 	
-	print ("Start check_live_game_score")
+	print ("DEBUG: Start check_live_game_score")
 	
-	#game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
-	with open('test_files/gcsb_test.json', 'r') as file_json:
-		game_json_data_clean=file_json.read()
-	game_json_data_clean = parse_json(game_json_data_clean)
-	print("Game ID: %s" % gc_id)
+	game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+	#DEBUG TEST
+	#with open('test_files/gcsb_test.json', 'r') as file_json:
+	#	game_json_data_clean=file_json.read()
+	#game_json_data_clean = parse_json(game_json_data_clean)
+	print("DEBUG: Game ID: %s" % gc_id)
 	
-	print ("Start json game data assign")
+	print ("DEBUG: Start json game data assign")
 	home_dict = game_json_data_clean['h']
 	away_dict = game_json_data_clean['a']
 	#le_dict = game_json_data_clean['le']
@@ -462,12 +462,12 @@ def reset_light():
 
 
 def light_on():
-	print('Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, True)
-	print('Disabled GPIO')#gpio_disable time.sleep(0.25)
+	print('DEBUG: Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, True)
+	print('DEBUG: Disabled GPIO')#gpio_disable time.sleep(0.25)
 
 
 def light_off():
-	print('Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, False)
+	print('DEBUG: Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, False)
 	time.sleep(0.25)
 
 
@@ -478,10 +478,10 @@ def cycle_light():
 
 def activate_goal_light():
 	print 'Activating Goal light'
-	print('Disabled GPIO')#gpio_disable light_on()
-	print('Disabled GPIO')#gpio_disable time.sleep(10) #Leave light on for 10 secs - GOAL!!!
-	print('Disabled GPIO')#gpio_disable light_off()
-	print('Disabled GPIO')#gpio_disable reset_light()
+	print('DEBUG: Disabled GPIO')#gpio_disable light_on()
+	print('DEBUG: Disabled GPIO')#gpio_disable time.sleep(10) #Leave light on for 10 secs - GOAL!!!
+	print('DEBUG: Disabled GPIO')#gpio_disable light_off()
+	print('DEBUG: Disabled GPIO')#gpio_disable reset_light()
 
 
 def parse_arguments(argv):
@@ -516,7 +516,7 @@ def parse_arguments(argv):
 def parse_json(json_input):
 	global json_data_check
 	try:
-		print ("json_data_check is %d" % json_data_check)
+		print ("DEBUG: json_data_check is %d" % json_data_check)
 		parsed_json = json.loads(json_input)
 	except ValueError as e:
 		print 'Bad JSON data'
@@ -549,5 +549,5 @@ if __name__ == '__main__':
 	
 	finally:
 		print "Running GPIO Cleanup"
-		print('Disabled GPIO')#gpio_disable GPIO.cleanup() # this ensures a clean exit
+		print('DEBUG: Disabled GPIO')#gpio_disable GPIO.cleanup() # this ensures a clean exit
 
