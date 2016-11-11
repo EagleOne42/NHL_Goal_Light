@@ -218,17 +218,23 @@ def find_game_info():
 	global home_team_name
 	global home_team_locale
 	global home_team_result
+	global home_team_score
 	global away_team_name
 	global away_team_locale
 	global away_team_result
+	global away_team_score
 	global game_api_url
 	json_data_check = 1
 	
 	#Download jsonp and save clean and parsed data to 
-	scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
-	#scoreboard_json_data_clean = 
+	#scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
+	with open('test_files/RegularSeasonScoreboardv3_test.json', 'r') as file_json:
+		scoreboard_json_data_clean=file_json.read()
+	
+	scoreboard_json_data_clean = parse_json(scoreboard_json_data_clean)
 	
 	print ("Start json search and assign")
+	print todays_date
 	for key in scoreboard_json_data_clean:
 		if key == 'games':
 			for game_info in scoreboard_json_data_clean[key]:
@@ -255,6 +261,9 @@ def find_game_info():
 						home_team_locale = fix_locale(home_team_locale)
 						away_team_name = fix_name(away_team_name)
 						home_team_name = fix_name(home_team_name)
+						
+						home_team_score = game_info['hts']
+						away_team_score = game_info['ats']
 						
 						game_api_url = 'http://live.nhle.com/GameData/20162017/%d/gc/gcsb.jsonp' % gc_id
 
@@ -315,14 +324,10 @@ def check_game_time():
 		print ("gc_id found - looks like there is a game today")
 		
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
-
+	
 	# Different displays for different states of game:
-	# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
 	# Game from today finished, ex: TODAY (FINAL 2nd OT)
 	if 'FINAL' in status:
-		#if yesterdays_date in game_clock.title():
-		#	header_text += '\nYESTERDAY, ' + game_clock + ' '
-		#elif todays_date in game_clock.title() or 'TODAY' in game_clock:
 		header_text += '\nTODAY '
 		header_text += '(' + status + ')'
 		
@@ -366,10 +371,10 @@ def check_game_time():
 		#game_current(home_team_name,home_team_score,game_clock,status)
 		#game_current(away_team_name,away_team_score,game_clock,status)
 	print('')
-	if ('FINAL' in status) and (away_team_name == team or home_team_name == team) and (yesterdays_date in game_clock.title() or todays_date in game_clock.title() ): #Game over, no need to refresh every minute
+	if ('FINAL' in status) and todays_date in game_clock.title(): #Game over, no need to refresh every minute
 		print "Game over!"
 		refresh_time = 3600
-		team_playing = False
+		game_today = 0
 		print ""
 
 
@@ -384,7 +389,10 @@ def check_live_game_score():
 	
 	print ("Start check_live_game_score")
 	
-	game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+	#game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+	with open('test_files/gcsb_test.json', 'r') as file_json:
+		game_json_data_clean=file_json.read()
+	game_json_data_clean = parse_json(game_json_data_clean)
 	print("Game ID: %s" % gc_id)
 	
 	print ("Start json game data assign")
