@@ -251,12 +251,12 @@ def find_game_info():
 						away_team_locale = game_info['atn']
 						away_team_name = game_info['atv'].title()
 						away_team_result = game_info['atc']
-						away_team_score = game_info['ats']
+						#away_team_score = game_info['ats']
 						
 						home_team_locale = game_info['htn']
 						home_team_name = game_info['htv'].title()
 						home_team_result = game_info['htc']
-						home_team_score = game_info['hts']
+						#home_team_score = game_info['hts']
 						
 						# Fix strange names / locales returned by NHL
 						away_team_locale = fix_locale(away_team_locale)
@@ -372,8 +372,8 @@ def check_game_time():
 	# Game hasn't yet started
 	else:
 		print ("Game hasn't yet started")
-		print(away_team_name + ': ' + str(away_team_score))
-		print(home_team_name + ': ' + str(home_team_score))
+		print(away_team_name + ': n/a')
+		print(home_team_name + ': n/a')
 		refresh_time = 900 #15min
 		#game_current(home_team_name,home_team_score,game_clock,status)
 		#game_current(away_team_name,away_team_score,game_clock,status)
