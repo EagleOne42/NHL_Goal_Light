@@ -139,7 +139,6 @@ def main():
 		check_game_time()
 		if ( game_today == 1 ):
 			check_live_game_score()
-			#check_game_time()
 			print ("DEBUG: End of main. ")
 			print
 			print ("DEBUG INFO:")
@@ -157,12 +156,25 @@ def main():
 			print ("URL: %s" % game_api_url)
 			print ("home_team_score: %s" % home_team_score)
 			print ("home_team_shots: %s" % home_team_shots)
-			#print ("home_team_on_ice: %s" % home_team_on_ice)
+			print ("home_team_on_ice: %s" % home_team_on_ice)
 			print ("away_team_score: %s" % away_team_score)
 			print ("away_team_shots: %s" % away_team_shots)
-			#print ("away_team_on_ice: %s" % away_team_on_ice)
-			#print ("last_play: %s" % last_play)
+			print ("away_team_on_ice: %s" % away_team_on_ice)
+			print ("last_play: %s" % last_play)
 			print ("DEBUG: END OF DEBUG OUTPUT")
+			
+			if ( team in home_team_name ):
+				if int(home_old_score) < int(home_team_score):
+					print ("%s GOAL!" % home_team_name)
+					activate_goal_light()
+					home_old_score = home_team_score
+			
+			if ( team in away_team_name ):
+				if int(away_old_score) < int(away_team_score):
+					print ("%s GOAL!" % away_team_name)
+					activate_goal_light()
+					away_old_score = away_team_score
+		
 		refresh_time_min = (refresh_time / 60)
 		print ("Setting refresh_time to %d min" % refresh_time_min)
 		time.sleep(refresh_time)
@@ -354,18 +366,19 @@ def check_game_time():
 		#print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + away_team_score + Style.RESET_ALL)
 		print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + str(away_team_score) + Style.RESET_ALL)
 		print(home_team_name + ': ' + str(home_team_score))
+		refresh_time = 3600
 		
 	# Home team wins
 	elif home_team_result == 'winner':
 		print(away_team_name + ': ' + str(away_team_score))
 		print(Style.BRIGHT + Fore.GREEN + home_team_name + ': ' + str(home_team_score) + Style.RESET_ALL)
+		refresh_time = 3600
 		
 	# Game still underway
 	elif 'progress' in game_stage or 'critical' in game_stage:
 		print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
 		print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
-		#game_current(home_team_name,home_team_score,game_clock,status) 
-		#game_current(away_team_name,away_team_score,game_clock,status)
+		refresh_time = 0
 		
 	elif (game_clock == "PRE GAME"): #30 minutes to game time
 		refresh_time = 60 #1 minute
@@ -378,8 +391,7 @@ def check_game_time():
 		print(away_team_name + ': n/a')
 		print(home_team_name + ': n/a')
 		refresh_time = 900 #15min
-		#game_current(home_team_name,home_team_score,game_clock,status)
-		#game_current(away_team_name,away_team_score,game_clock,status)
+	
 	print('')
 	if ('FINAL' in status) and todays_date in game_clock.title(): #Game over, no need to refresh every minute
 		print "Game over!"
@@ -409,17 +421,37 @@ def check_live_game_score():
 	print ("DEBUG: Start json game data assign")
 	home_dict = game_json_data_clean['h']
 	away_dict = game_json_data_clean['a']
-	#le_dict = game_json_data_clean['le']
+	try:
+		game_json_data_clean['le']
+	except KeyError:
+		print ("DEBUG: le is missing")
+		le_dict = "n/a"
+		last_play = "n/a"
+	else:
+		le_dict = game_json_data_clean['le']
+		last_play = le_dict['desc']
 	
 	home_team_score = home_dict['tot']['g']
 	home_team_shots = home_dict['tot']['s']
-	#home_team_on_ice = home_dict['oi']
+	
+	try:
+		home_dict['oi']
+	except KeyError:
+		print ("DEBUG: Home players reported on ice is missing")
+		home_team_on_ice = "n/a"
+	else:
+		home_team_on_ice = home_dict['oi']
 	
 	away_team_score = away_dict['tot']['g']
 	away_team_shots = away_dict['tot']['s']
-	#away_team_on_ice = away_dict['oi']
 	
-	#last_play = le_dict['desc']
+	try:
+		away_dict['oi']
+	except KeyError:
+		print ("DEBUG: Away players reported on ice is missing")
+		away_team_on_ice = "n/a"
+	else:
+		away_team_on_ice = away_dict['oi']
 
 
 def setup_light():
