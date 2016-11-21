@@ -3,8 +3,8 @@ team = 'Blues' #Set default team - will use this if the team option flag is not 
 #Known issues and things todo
 #Need detection of no game today
 #Blue jackets not working due to name fix required
-#Change to use .title() for team names (input can be different case
-#On ice players and last play need to have the long json vs the short from before the game to work.
+#Change to use .title() for team names (input can be different case)
+#On ice players and last play need to have the long json vs the short from before the game to work. - fixed a different way
 #Back to back games will not work correctly
 
 #Main team list
@@ -165,15 +165,35 @@ def main():
 			
 			if ( team in home_team_name ):
 				if int(home_old_score) < int(home_team_score):
+					current_count = 0
+					target = open('logs/goal_log.txt', 'a')
+					target.write('%s GOAL ' % team)
+					target.write('AT %s\n' % str(datetime.datetime.now()))
+					target.close()
+					while (current_count < 80):
+						print 'Count is:', current_count
+						time.sleep(1)
+						current_count += 1
+					
 					print ("%s GOAL!" % home_team_name)
 					activate_goal_light()
-					home_old_score = home_team_score
+					home_old_score = int(home_team_score)
 			
 			if ( team in away_team_name ):
 				if int(away_old_score) < int(away_team_score):
+					current_count = 0
+					target = open('logs/goal_log.txt', 'a')
+					target.write('%s GOAL ' % team)
+					target.write('AT %s\n' % str(datetime.datetime.now()))
+					target.close()
+					while (current_count < 80):
+						print 'Count is:', current_count
+						time.sleep(1)
+						current_count += 1
+					
 					print ("%s GOAL!" % away_team_name)
 					activate_goal_light()
-					away_old_score = away_team_score
+					away_old_score = int(away_team_score)
 		
 		refresh_time_min = (refresh_time / 60)
 		print ("Setting refresh_time to %d min" % refresh_time_min)
@@ -259,7 +279,7 @@ def find_game_info():
 					print ("DEBUG: game_clock: %s" % game_clock.title())
 					print ("DEBUG: status: %s" % status)
 					
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):# or 'FINAL' in status or 'PRE GAME' in game_clock ):
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or 'PRE GAME' in game_clock ):
 						gc_id = game_info['id']
 						print ("DEBUG: Team Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
@@ -381,9 +401,9 @@ def check_game_time():
 		refresh_time = 0
 		
 	elif (game_clock == "PRE GAME"): #30 minutes to game time
-		refresh_time = 60 #1 minute
 		print "Pre Game - It is almost game time!"
 		print "Refresh time: " + str(refresh_time) + " seconds (1 minute)"
+		refresh_time = 60 #1 minute
 	
 	# Game hasn't yet started
 	else:
@@ -395,9 +415,9 @@ def check_game_time():
 	print('')
 	if ('FINAL' in status) and todays_date in game_clock.title(): #Game over, no need to refresh every minute
 		print "Game over!"
-		refresh_time = 3600
 		game_today = 0
 		print ""
+		refresh_time = 3600
 
 
 def check_live_game_score():
