@@ -1,0 +1,1 @@
+for i in `md5sum * | awk '{print $1}' | sort -u` ; do grep -m 1 $i rm.txt ; done | awk '{print $2}' > cp.txt ; for i in `cat cp.txt` ; do cp $i uniq/ ; done

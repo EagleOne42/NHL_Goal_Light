@@ -3,8 +3,8 @@ team = 'Blues' #Set default team - will use this if the team option flag is not 
 #Known issues and things todo
 #Need detection of no game today
 #Blue jackets not working due to name fix required
-#Change to use .title() for team names (input can be different case
-#On ice players and last play need to have the long json vs the short from before the game to work.
+#Change to use .title() for team names (input can be different case)
+#On ice players and last play need to have the long json vs the short from before the game to work. - fixed a different way
 #Back to back games will not work correctly
 
 #Main team list
@@ -126,6 +126,7 @@ def main():
 	global away_old_score
 	global old_game_data
 	global todays_date
+	global game_today
 	clear_screen()
 	
 	# Format dates to match NHL API style:
@@ -133,15 +134,12 @@ def main():
 	t = datetime.datetime.now()
 	todays_date = "" + t.strftime("%A") + " " + "%s/%s" % (t.month, t.day)
 	
-	print ("DEBUG: Call find_game_info")
-	find_game_info()
-	
 	while 1:
+		find_game_info()
 		check_game_time()
 		if ( game_today == 1 ):
 			check_live_game_score()
-			#check_game_time()
-			print ("End of main. ")
+			print ("DEBUG: End of main. ")
 			print
 			print ("DEBUG INFO:")
 			print ("json_data_check: %s" % json_data_check)
@@ -158,12 +156,45 @@ def main():
 			print ("URL: %s" % game_api_url)
 			print ("home_team_score: %s" % home_team_score)
 			print ("home_team_shots: %s" % home_team_shots)
-			#print ("home_team_on_ice: %s" % home_team_on_ice)
+			print ("home_team_on_ice: %s" % home_team_on_ice)
 			print ("away_team_score: %s" % away_team_score)
 			print ("away_team_shots: %s" % away_team_shots)
-			#print ("away_team_on_ice: %s" % away_team_on_ice)
-			#print ("last_play: %s" % last_play)
-			print ("END OF DEBUG OUTPUT")
+			print ("away_team_on_ice: %s" % away_team_on_ice)
+			print ("last_play: %s" % last_play)
+			print ("DEBUG: END OF DEBUG OUTPUT")
+			
+			if ( team in home_team_name ):
+				if int(home_old_score) < int(home_team_score):
+					current_count = 0
+					target = open('logs/goal_log.txt', 'a')
+					target.write('%s GOAL ' % team)
+					target.write('AT %s\n' % str(datetime.datetime.now()))
+					target.close()
+					while (current_count < 80):
+						print 'Count is:', current_count
+						time.sleep(1)
+						current_count += 1
+					
+					print ("%s GOAL!" % home_team_name)
+					activate_goal_light()
+					home_old_score = int(home_team_score)
+			
+			if ( team in away_team_name ):
+				if int(away_old_score) < int(away_team_score):
+					current_count = 0
+					target = open('logs/goal_log.txt', 'a')
+					target.write('%s GOAL ' % team)
+					target.write('AT %s\n' % str(datetime.datetime.now()))
+					target.close()
+					while (current_count < 80):
+						print 'Count is:', current_count
+						time.sleep(1)
+						current_count += 1
+					
+					print ("%s GOAL!" % away_team_name)
+					activate_goal_light()
+					away_old_score = int(away_team_score)
+		
 		refresh_time_min = (refresh_time / 60)
 		print ("Setting refresh_time to %d min" % refresh_time_min)
 		time.sleep(refresh_time)
@@ -219,16 +250,23 @@ def find_game_info():
 	global home_team_name
 	global home_team_locale
 	global home_team_result
+	global home_team_score
 	global away_team_name
 	global away_team_locale
 	global away_team_result
+	global away_team_score
 	global game_api_url
 	json_data_check = 1
 	
 	#Download jsonp and save clean and parsed data to 
 	scoreboard_json_data_clean = get_json_from_nhl(scoreboard_api_url, 'loadScoreboard(')
+	#DEBUG TEST
+	#with open('test_files/RegularSeasonScoreboardv3_test.json', 'r') as file_json:
+	#	scoreboard_json_data_clean=file_json.read()
+	#scoreboard_json_data_clean = parse_json(scoreboard_json_data_clean)
 	
-	print ("Start json search and assign")
+	print ("DEBUG: Start json search and assign")
+	print todays_date
 	for key in scoreboard_json_data_clean:
 		if key == 'games':
 			for game_info in scoreboard_json_data_clean[key]:
@@ -238,17 +276,22 @@ def find_game_info():
 					# Assign more meaningful names
 					game_clock = game_info['ts']
 					status = game_info['bs']
-					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status ):
+					print ("DEBUG: game_clock: %s" % game_clock.title())
+					print ("DEBUG: status: %s" % status)
+					
+					if ( todays_date in game_clock.title() or 'TODAY' in game_clock or 'LIVE' in status or 'PRE GAME' in game_clock ):
 						gc_id = game_info['id']
-						print ("DEBUG: Game ID: %d " % gc_id)
+						print ("DEBUG: Team Game ID: %d " % gc_id)
 						game_stage = game_info['tsc']
 						away_team_locale = game_info['atn']
 						away_team_name = game_info['atv'].title()
 						away_team_result = game_info['atc']
+						#away_team_score = game_info['ats']
 						
 						home_team_locale = game_info['htn']
 						home_team_name = game_info['htv'].title()
 						home_team_result = game_info['htc']
+						#home_team_score = game_info['hts']
 						
 						# Fix strange names / locales returned by NHL
 						away_team_locale = fix_locale(away_team_locale)
@@ -295,7 +338,7 @@ def get_json_from_nhl(api_url, pretext_to_remove):
 		# Remove the trailing ')'
 		json_data  = json_data[:-1]
 		#Send to the parse function and save the cleaned json data
-		print ("Start json parse call")
+		print ("DEBUG: Start json parse call")
 		json_data_clean = parse_json(json_data)
 		return json_data_clean
 
@@ -307,24 +350,20 @@ def check_game_time():
 	try:
 		gc_id
 	except NameError:
-		print ("gc_id not found - looks like there is no game today")
+		print ("DEBUG: gc_id not found - looks like there is no game today")
 		game_today = 0
-		refresh_time = 5#3600
-		time.sleep(10)
+		refresh_time = 3600
 		return
 	else:
-		print ("gc_id found - looks like there is a game today")
+		print ("DEBUG: gc_id found - looks like there is a game today")
+		game_today = 1
 		
 	header_text = away_team_locale + ' ' + away_team_name + ' @ ' + home_team_locale + ' ' + home_team_name
-
+	
 	# Different displays for different states of game:
-	# Game from yesterday, ex: on YESTERDAY, MONDAY 4/20 (FINAL 2nd OT)
 	# Game from today finished, ex: TODAY (FINAL 2nd OT)
 	if 'FINAL' in status:
-		if yesterdays_date in game_clock.title():
-			header_text += '\nYESTERDAY, ' + game_clock + ' '
-		elif todays_date in game_clock.title() or 'TODAY' in game_clock:
-			header_text += '\nTODAY '
+		header_text += '\nTODAY '
 		header_text += '(' + status + ')'
 		
 	# Upcoming game, ex: TUESDAY 4/21, 7:00 PM EST)
@@ -339,7 +378,6 @@ def check_game_time():
 	else:
 		header_text += Fore.YELLOW + '\n(' + game_clock + ' PERIOD)' + Style.RESET_ALL
 		
-		
 	print(header_text)
 	
 	# Highlight the winner of finished games in green, and games underway in blue:
@@ -348,45 +386,38 @@ def check_game_time():
 		#print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + away_team_score + Style.RESET_ALL)
 		print(Style.BRIGHT + Fore.GREEN + away_team_name + ': ' + str(away_team_score) + Style.RESET_ALL)
 		print(home_team_name + ': ' + str(home_team_score))
-		
+		refresh_time = 3600
 		
 	# Home team wins
 	elif home_team_result == 'winner':
 		print(away_team_name + ': ' + str(away_team_score))
 		print(Style.BRIGHT + Fore.GREEN + home_team_name + ': ' + str(home_team_score) + Style.RESET_ALL)
+		refresh_time = 3600
 		
 	# Game still underway
 	elif 'progress' in game_stage or 'critical' in game_stage:
 		print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
 		print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
-		#game_current(home_team_name,home_team_score,game_clock,status) 
-		#game_current(away_team_name,away_team_score,game_clock,status)
+		refresh_time = 0
 		
+	elif (game_clock == "PRE GAME"): #30 minutes to game time
+		print "Pre Game - It is almost game time!"
+		print "Refresh time: " + str(refresh_time) + " seconds (1 minute)"
+		refresh_time = 60 #1 minute
+	
 	# Game hasn't yet started
 	else:
-		print(away_team_name + ': ' + str(away_team_score))
-		print(home_team_name + ': ' + str(home_team_score))
-		#game_current(home_team_name,home_team_score,game_clock,status)
-		#game_current(away_team_name,away_team_score,game_clock,status)
+		print ("Game hasn't yet started")
+		print(away_team_name + ': n/a')
+		print(home_team_name + ': n/a')
+		refresh_time = 900 #15min
+	
 	print('')
-	if ('FINAL' in status) and (away_team_name == team or home_team_name == team) and (yesterdays_date in game_clock.title() or todays_date in game_clock.title() ): #Game over, no need to refresh every minute
+	if ('FINAL' in status) and todays_date in game_clock.title(): #Game over, no need to refresh every minute
 		print "Game over!"
-		refresh_time = 21600
-		team_playing = False
-		home_old_score = 0 
-		away_old_score = 0
-		print "Refresh in: " + str(refresh_time) + " seconds (6 hours)"
-		print "Team playing: " + str(team_playing)
+		game_today = 0
 		print ""
-		
-		
-	#if team_playing == False:
-	#	print ("Current time: " + str(datetime.datetime.now()))
-	#	refresh_time = 21600 # 6 hours
-	#	print team + " are not playing. Refreshing in " + str(refresh_time) + " seconds (6 hours)."
-	#	# Perfrom the refresh
-		time.sleep(refresh_time)
-
+		refresh_time = 3600
 
 
 def check_live_game_score():
@@ -398,25 +429,49 @@ def check_live_game_score():
 	global away_team_on_ice
 	global last_play
 	
-	print ("Start check_live_game_score")
+	print ("DEBUG: Start check_live_game_score")
 	
 	game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
-	print("Game ID: %s" % gc_id)
+	#DEBUG TEST
+	#with open('test_files/gcsb_test.json', 'r') as file_json:
+	#	game_json_data_clean=file_json.read()
+	#game_json_data_clean = parse_json(game_json_data_clean)
+	print("DEBUG: Game ID: %s" % gc_id)
 	
-	print ("Start json game data assign")
+	print ("DEBUG: Start json game data assign")
 	home_dict = game_json_data_clean['h']
 	away_dict = game_json_data_clean['a']
-	#le_dict = game_json_data_clean['le']
+	try:
+		game_json_data_clean['le']
+	except KeyError:
+		print ("DEBUG: le is missing")
+		le_dict = "n/a"
+		last_play = "n/a"
+	else:
+		le_dict = game_json_data_clean['le']
+		last_play = le_dict['desc']
 	
 	home_team_score = home_dict['tot']['g']
 	home_team_shots = home_dict['tot']['s']
-	#home_team_on_ice = home_dict['oi']
+	
+	try:
+		home_dict['oi']
+	except KeyError:
+		print ("DEBUG: Home players reported on ice is missing")
+		home_team_on_ice = "n/a"
+	else:
+		home_team_on_ice = home_dict['oi']
 	
 	away_team_score = away_dict['tot']['g']
 	away_team_shots = away_dict['tot']['s']
-	#away_team_on_ice = away_dict['oi']
 	
-	#last_play = le_dict['desc']
+	try:
+		away_dict['oi']
+	except KeyError:
+		print ("DEBUG: Away players reported on ice is missing")
+		away_team_on_ice = "n/a"
+	else:
+		away_team_on_ice = away_dict['oi']
 
 
 def setup_light():
@@ -462,12 +517,12 @@ def reset_light():
 
 
 def light_on():
-	print('Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, True)
-	print('Disabled GPIO')#gpio_disable time.sleep(0.25)
+	print('DEBUG: Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, True)
+	print('DEBUG: Disabled GPIO')#gpio_disable time.sleep(0.25)
 
 
 def light_off():
-	print('Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, False)
+	print('DEBUG: Disabled GPIO')#gpio_disable GPIO.output(goal_light_gpio_pins, False)
 	time.sleep(0.25)
 
 
@@ -478,15 +533,15 @@ def cycle_light():
 
 def activate_goal_light():
 	print 'Activating Goal light'
-	print('Disabled GPIO')#gpio_disable light_on()
-	print('Disabled GPIO')#gpio_disable time.sleep(10) #Leave light on for 10 secs - GOAL!!!
-	print('Disabled GPIO')#gpio_disable light_off()
-	print('Disabled GPIO')#gpio_disable reset_light()
+	print('DEBUG: Disabled GPIO')#gpio_disable light_on()
+	print('DEBUG: Disabled GPIO')#gpio_disable time.sleep(10) #Leave light on for 10 secs - GOAL!!!
+	print('DEBUG: Disabled GPIO')#gpio_disable light_off()
+	print('DEBUG: Disabled GPIO')#gpio_disable reset_light()
 
 
 def parse_arguments(argv):
 	try:
-		opts, args = getopt.getopt(argv, "ht:d", ["help", "team=", "today-only"])
+		opts, args = getopt.getopt(argv, "ht:d", ["help", "team="])
 	except getopt.GetoptError:
 		print ''
 		print 'Invalid option'
@@ -506,7 +561,7 @@ def parse_arguments(argv):
 				try:
 					team = nhl_team_dict[arg]
 				except:
-					print 'Team name not in list.  Make sure to use single quote around name.'
+					print 'Team name not in list.  Make sure to use single quotes around name.'
 					print 'You can use team name, city/location, or the 3 letter name used by the NHL'
 					print "Example) For the St. Louis Blues you can use 'Blues' or 'St Louis' or 'St. Louis' or 'STL'"
 					print 'List of teams: %s' % (team_list,)
@@ -516,7 +571,7 @@ def parse_arguments(argv):
 def parse_json(json_input):
 	global json_data_check
 	try:
-		print ("json_data_check is %d" % json_data_check)
+		print ("DEBUG: json_data_check is %d" % json_data_check)
 		parsed_json = json.loads(json_input)
 	except ValueError as e:
 		print 'Bad JSON data'
@@ -549,5 +604,5 @@ if __name__ == '__main__':
 	
 	finally:
 		print "Running GPIO Cleanup"
-		print('Disabled GPIO')#gpio_disable GPIO.cleanup() # this ensures a clean exit
+		print('DEBUG: Disabled GPIO')#gpio_disable GPIO.cleanup() # this ensures a clean exit
 
