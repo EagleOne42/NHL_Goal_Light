@@ -1,0 +1,82 @@
+Could not get response from NHL.com trying again...
+Running GPIO Cleanup
+DEBUG: Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 600, in <module>
+    main()
+  File "nhl_goal_light.py", line 141, in main
+    check_live_game_score()
+  File "nhl_goal_light.py", line 434, in check_live_game_score
+    game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+  File "nhl_goal_light.py", line 331, in get_json_from_nhl
+    jsonp_text = jsonp_raw.text
+AttributeError: 'str' object has no attribute 'text'
+jono@raspberry-pi1 ~/git_repos/NHL_Goal_Light $
+
+
+
+
+
+New York Rangers @ Pittsburgh Penguins
+(19:32 1st PERIOD)
+Running GPIO Cleanup
+DEBUG: Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 600, in <module>
+    main()
+  File "nhl_goal_light.py", line 139, in main
+    check_game_time()
+  File "nhl_goal_light.py", line 404, in check_game_time
+    print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
+NameError: global name 'away_team_score' is not defined
+Mon 21 Nov 18:09:12 CST 2016
+jono@raspberry-pi1 ~/git_repos/NHL_Goal_Light $
+
+
+
+New York Rangers @ Pittsburgh Penguins
+(18:11 1st PERIOD)
+
+DEBUG: Start check_live_game_score
+DEBUG: Starting get_json_from_nhl
+DEBUG: Start json parse call
+DEBUG: json_data_check is 1
+Bad JSON data
+invalid json: Expecting object: line 1 column 663 (char 663)
+DEBUG: Game ID: 2016020277
+DEBUG: Start json game data assign
+Running GPIO Cleanup
+DEBUG: Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 600, in <module>
+    main()
+  File "nhl_goal_light.py", line 141, in main
+    check_live_game_score()
+  File "nhl_goal_light.py", line 442, in check_live_game_score
+    home_dict = game_json_data_clean['h']
+TypeError: 'int' object has no attribute '__getitem__'
+Mon 21 Nov 18:11:14 CST 2016
+
+
+
+
+New York Rangers @ Pittsburgh Penguins
+(17:06 1st PERIOD)
+
+DEBUG: Start check_live_game_score
+DEBUG: Starting get_json_from_nhl
+Could not get response from NHL.com trying again...
+Running GPIO Cleanup
+DEBUG: Disabled GPIO
+Traceback (most recent call last):
+  File "nhl_goal_light.py", line 600, in <module>
+    main()
+  File "nhl_goal_light.py", line 141, in main
+    check_live_game_score()
+  File "nhl_goal_light.py", line 434, in check_live_game_score
+    game_json_data_clean = get_json_from_nhl(game_api_url, 'GCSB.load(')
+  File "nhl_goal_light.py", line 331, in get_json_from_nhl
+    jsonp_text = jsonp_raw.text
+AttributeError: 'str' object has no attribute 'text'
+Mon 21 Nov 18:14:05 CST 2016
+

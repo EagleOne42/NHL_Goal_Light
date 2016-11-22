@@ -394,17 +394,17 @@ def check_game_time():
 		print(Style.BRIGHT + Fore.GREEN + home_team_name + ': ' + str(home_team_score) + Style.RESET_ALL)
 		refresh_time = 3600
 		
+	elif (game_clock == "PRE GAME"): #30 minutes to game time
+                print "Pre Game - It is almost game time!"
+                print "Refresh time: " + str(refresh_time) + " seconds (1 minute)"
+                refresh_time = 60 #1 minute
+	
 	# Game still underway
 	elif 'progress' in game_stage or 'critical' in game_stage:
-		print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
-		print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
+		#print(Fore.CYAN + away_team_name + ': ' + str(away_team_score))
+		#print(home_team_name + ': ' + str(home_team_score) + Fore.RESET)
 		refresh_time = 0
 		
-	elif (game_clock == "PRE GAME"): #30 minutes to game time
-		print "Pre Game - It is almost game time!"
-		print "Refresh time: " + str(refresh_time) + " seconds (1 minute)"
-		refresh_time = 60 #1 minute
-	
 	# Game hasn't yet started
 	else:
 		print ("Game hasn't yet started")
